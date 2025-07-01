@@ -7,6 +7,7 @@ import TextInput from "../components/TextInput";
 import DateInput from "../components/DateInput";
 import ZipCodeInput from "../components/ZipCodeInput";
 import SubmitButton from "../components/SubmitButton";
+import ResultsTab from "../components/ResultsTab";
 import { isValidDOB } from "../utils/ageUtils";
 
 const MainPage: React.FC = () => {
@@ -35,13 +36,13 @@ const MainPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
-      <div className="bg-brand-navy h-[120px] flex items-center">
+      <div className="bg-brand-navy h-[96px] flex items-center">
         <div className="w-full max-w-content mx-auto px-gutter">
           <img
             src={EHLogo}
             alt="Elevance Health Logo"
-            width={139}
-            height={61}
+            width={130}
+            height={52}
             className="object-contain"
           />
         </div>
@@ -51,12 +52,13 @@ const MainPage: React.FC = () => {
       <div className="w-full flex justify-center mt-12">
         <div className="w-full max-w-content px-gutter">
           <TitleBlock
-            title="Health Agent"
+            title="Personal Details"
             subtitle="Enter patient information below. This data will be processed through the Health Agent workflow with AI analysis and will be available for interactive chat queries."
           />
 
           {/* Form */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-x-16 gap-y-12 mb-8">
+          <form className = "bg-white shadow-[0_0_12px_rgba(0,0,0,0.1)] p-8 rounded-xl mb-12 max-w-[850px] mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-12 mb-6">
             <div className="w-full">
               <TextInput
                 placeholder="First Name"
@@ -104,6 +106,7 @@ const MainPage: React.FC = () => {
               />
             </div>
           </div>
+        </form>
 
           <SubmitButton onClick={handleSubmit} />
 
@@ -114,6 +117,7 @@ const MainPage: React.FC = () => {
               <h3 className="text-h3 text-brand-navy font-semibold mb-4">
                 Health Agent Analysis Results
               </h3>
+              <ResultsTab />
             </div>
           )}
         </div>
