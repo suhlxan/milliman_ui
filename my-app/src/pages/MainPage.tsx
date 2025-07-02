@@ -113,7 +113,7 @@ const MainPage: React.FC = () => {
           {/* Results Section */}
           {submitted && (
             <div className="mt-16">
-              <hr className="border-t-2 border-brand-cyan mb-6" />
+              {/* <hr className="border-t-2 border-brand-cyan mb-6" /> */}
               <h3 className="text-h3 text-brand-navy font-semibold mb-4">
                 Health Agent Analysis Results
               </h3>
