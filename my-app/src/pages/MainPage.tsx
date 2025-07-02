@@ -1,129 +1,179 @@
-import React, { useState, useEffect } from "react";
-import EHLogo from "../assets/images/EH_Logo.svg";
-import TitleBlock from "../components/TitleBlock";
-import SSNField from "../components/SSNField";
-import GenderDropdown from "../components/GenderDropdown";
-import TextInput from "../components/TextInput";
-import DateInput from "../components/DateInput";
-import ZipCodeInput from "../components/ZipCodeInput";
-import SubmitButton from "../components/SubmitButton";
-import ResultsTab from "../components/ResultsTab";
-import { isValidDOB } from "../utils/ageUtils";
+// src/pages/MainPage.tsx
+import React, { useState, useEffect } from 'react';
+import {
+  TextField,
+  MenuItem,
+  Button,
+  Typography,
+} from '@mui/material';
+import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
+import { AdapterDateFns }                   from '@mui/x-date-pickers/AdapterDateFns';
+import { subYears }                         from 'date-fns';
 
-const MainPage: React.FC = () => {
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [gender, setGender] = useState("");
-  const [ssn, setSSN] = useState("");
-  const [dob, setDob] = useState("");
-  const [zipCode, setZipCode] = useState("");
-  const [showSSN, setShowSSN] = useState(false);
+import ResultsTab from '../components/ResultsTab';
+import SSNField   from '../components/SSNField';
+import EHLogo     from '../assets/images/EH_Logo.svg';
+
+const GENDERS = ['Female', 'Male', 'Other'];
+
+// Regex to allow letters (including accents), hyphens and apostrophes
+const nameSanitizer = (value: string) =>
+  value.replace(/[^\p{L}'\-]/gu, '');
+
+export default function MainPage() {
+  const [firstName, setFirstName] = useState('');
+  const [lastName,  setLastName]  = useState('');
+  const [gender,    setGender]    = useState('');
+  const [ssn,       setSSN]       = useState('');
+  const [showSSN,   setShowSSN]   = useState(false);
+  const [dob,       setDob]       = useState<Date | null>(null);
+  const [zipCode,   setZipCode]   = useState('');
   const [submitted, setSubmitted] = useState(false);
 
+  // calculate today and 150 years ago
+  const today = new Date();
+  const earliest = subYears(today, 150);
+
   useEffect(() => {
-    document.title = "Elevance Health | Milliman Dashboard";
+    document.title = 'Elevance Health | Milliman Dashboard';
   }, []);
 
   const handleSubmit = () => {
     console.log({ firstName, lastName, gender, ssn, dob, zipCode });
-    alert("Health Agent Analysis executed!");
+    alert('Health Agent Analysis executed!');
     setSubmitted(true);
   };
 
+  // uniform height + full width for all inputs
   const inputClasses =
-    "border border-brand-gray p-3 rounded-md outline-none focus:border-brand-mediumBlue focus:ring-2 focus:ring-brand-mediumBlue transition-all duration-150 w-full";
+    'h-14 w-full rounded-md outline-none ' +
+    'focus:border-brand-mediumBlue focus:ring-2 focus:ring-brand-mediumBlue ' +
+    'transition-all duration-150';
 
   return (
-    <div className="min-h-screen bg-white">
-      {/* Header */}
-      <div className="bg-brand-navy h-[96px] flex items-center">
-        <div className="w-full max-w-content mx-auto px-gutter">
+    <div className="min-h-screen bg-gray-100">
+      {/* NAV BAR */}
+      <div className="bg-brand-navy">
+        <div className="max-w-6xl mx-auto px-4 py-4 flex items-center">
           <img
             src={EHLogo}
             alt="Elevance Health Logo"
-            width={130}
-            height={52}
-            className="object-contain"
+            className="h-10 object-contain"
           />
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="w-full flex justify-center mt-12">
-        <div className="w-full max-w-content px-gutter">
-          <TitleBlock
-            title="Personal Details"
-            subtitle="Enter patient information below. This data will be processed through the Health Agent workflow with AI analysis and will be available for interactive chat queries."
-          />
+      {/* PAGE CONTENT */}
+      <div className="max-w-6xl mx-auto px-4 py-12">
+        <Typography component="h2" variant="h4" className="font-bold mb-6">
+          Personal Details
+        </Typography>
+        <Typography variant="body1" className="text-gray-600 mb-6">
+          Enter patient information below. This data will be processed through
+          the Health Agent workflow with AI analysis and will be available for
+          interactive chat queries.
+        </Typography>
 
-          {/* Form */}
-          <form className = "bg-white shadow-[0_0_12px_rgba(0,0,0,0.1)] p-8 rounded-xl mb-12 max-w-[850px] mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-12 mb-6">
-            <div className="w-full">
-              <TextInput
-                placeholder="First Name"
-                value={firstName}
-                onChange={setFirstName}
-                inputClasses={inputClasses}
-              />
-            </div>
-            <div className="w-full">
-              <TextInput
-                placeholder="Last Name"
-                value={lastName}
-                onChange={setLastName}
-                inputClasses={inputClasses}
-              />
-            </div>
-            <div className="w-full">
-              <GenderDropdown
-                value={gender}
-                onChange={setGender}
-                inputClasses={inputClasses}
-              />
-            </div>
-            <div className="w-full">
-              <SSNField
-                value={ssn}
-                show={showSSN}
-                onChange={setSSN}
-                onToggleVisibility={() => setShowSSN(!showSSN)}
-                inputClasses={inputClasses}
-              />
-            </div>
-            <div className="w-full">
-              <DateInput
+        {/* FORM CARD */}
+        <div className="bg-white rounded-2xl shadow-lg p-8 mt-8">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 items-center">
+            {/* First Name */}
+            <TextField
+              className={inputClasses}
+              label="First Name"
+              value={firstName}
+              onChange={e => setFirstName(nameSanitizer(e.target.value))}
+              variant="outlined"
+            />
+
+            {/* Last Name */}
+            <TextField
+              className={inputClasses}
+              label="Last Name"
+              value={lastName}
+              onChange={e => setLastName(nameSanitizer(e.target.value))}
+              variant="outlined"
+            />
+
+            {/* Gender */}
+            <TextField
+              className={inputClasses}
+              select
+              label="Gender"
+              value={gender}
+              onChange={e => setGender(e.target.value as string)}
+              variant="outlined"
+            >
+              {GENDERS.map(g => (
+                <MenuItem key={g} value={g}>
+                  {g}
+                </MenuItem>
+              ))}
+            </TextField>
+
+            {/* SSN */}
+            <SSNField
+              className={inputClasses}
+              value={ssn}
+              show={showSSN}
+              onChange={setSSN}
+              onToggleVisibility={() => setShowSSN(x => !x)}
+            />
+
+            {/* Date of Birth */}
+            <LocalizationProvider dateAdapter={AdapterDateFns}>
+              <DatePicker
+                label="Date of Birth"
                 value={dob}
-                onChange={setDob}
-                inputClasses={inputClasses}
+                onChange={newVal => setDob(newVal)}
+                openTo="year"
+                views={['year', 'month', 'day']}
+                minDate={earliest}
+                maxDate={today}
+                slotProps={{
+                  textField: {
+                    className: inputClasses,
+                    variant: 'outlined',
+                  },
+                }}
               />
-            </div>
-            <div className="w-full">
-              <ZipCodeInput
-                value={zipCode}
-                onChange={setZipCode}
-                inputClasses={inputClasses}
-              />
-            </div>
+            </LocalizationProvider>
+
+            {/* Zip Code */}
+            <TextField
+              className={inputClasses}
+              label="Zip Code"
+              placeholder="12345"
+              value={zipCode}
+              onChange={e => setZipCode(e.target.value.replace(/\D/g, '').slice(0, 5))}
+              inputProps={{ maxLength: 5, inputMode: 'numeric', pattern: '\\d*' }}
+              variant="outlined"
+            />
           </div>
-        </form>
-
-          <SubmitButton onClick={handleSubmit} />
-
-          {/* Results Section */}
-          {submitted && (
-            <div className="mt-16">
-              {/* <hr className="border-t-2 border-brand-cyan mb-6" /> */}
-              <h3 className="text-h3 text-brand-navy font-semibold mb-4">
-                Health Agent Analysis Results
-              </h3>
-              <ResultsTab />
-            </div>
-          )}
         </div>
+
+        {/* EXECUTE BUTTON */}
+        <div className="flex justify-center mt-8">
+          <Button
+            variant="contained"
+            size="large"
+            onClick={handleSubmit}
+            className="bg-brand-primary-blue hover:bg-brand-mediumBlue rounded-full px-12 py-3"
+          >
+            Execute Health Agent Analysis
+          </Button>
+        </div>
+
+        {/* RESULTS TABS */}
+        {submitted && (
+          <div className="mt-12">
+            <Typography variant="h5" className="font-semibold text-brand-navy mb-4">
+              Health Agent Analysis Results
+            </Typography>
+            <ResultsTab />
+          </div>
+        )}
       </div>
     </div>
   );
-};
-
-export default MainPage;
+}

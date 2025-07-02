@@ -1,10 +1,10 @@
 // src/components/ResultsTab.tsx
 import React, { useState } from "react";
 
-const tabs = ["MCID", "Medical Claims", "Pharmacy Claims"];
+const tabs = ["MCID Claims", "Medical Claims", "Pharmacy Claims"];
 
 const ResultsTab: React.FC = () => {
-    const [selected, setSelected] = useState("MCID");
+    const [selected, setSelected] = useState("MCID Claims");
 
     return (
         <div className="border-b border-brand-gray-light mb-6">

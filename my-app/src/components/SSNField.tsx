@@ -1,14 +1,20 @@
 // src/components/SSNField.tsx
 import React from "react";
+import {
+  TextField,
+  InputAdornment,
+  IconButton
+} from "@mui/material";
 import VisibilityOn from "../assets/images/visibility_on.svg";
 import VisibilityOff from "../assets/images/visibility_off.svg";
 
-interface SSNFieldProps {
+export interface SSNFieldProps {
   value: string;
   show: boolean;
-  onChange: (value: string) => void;
+  onChange: (newVal: string) => void;
   onToggleVisibility: () => void;
-  inputClasses: string;
+  /** any extra classes for spacing, etc */
+  className?: string;
 }
 
 const SSNField: React.FC<SSNFieldProps> = ({
@@ -16,43 +22,52 @@ const SSNField: React.FC<SSNFieldProps> = ({
   show,
   onChange,
   onToggleVisibility,
-  inputClasses,
+  className = ""
 }) => {
   const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // strip non-digits, max 9 chars
     const raw = e.target.value.replace(/\D/g, "").slice(0, 9);
-    const formatted =
-      raw.length > 5
-        ? `${raw.slice(0, 3)}-${raw.slice(3, 5)}-${raw.slice(5)}`
-        : raw.length > 3
-        ? `${raw.slice(0, 3)}-${raw.slice(3)}`
-        : raw;
+    // format with dashes
+    let formatted: string;
+    if (raw.length > 5) {
+      formatted = `${raw.slice(0,3)}-${raw.slice(3,5)}-${raw.slice(5)}`;
+    } else if (raw.length > 3) {
+      formatted = `${raw.slice(0,3)}-${raw.slice(3)}`;
+    } else {
+      formatted = raw;
+    }
     onChange(formatted);
   };
 
   return (
-    <div className="relative">
-      <input
-        type={show ? "text" : "password"}
-        placeholder="SSN"
-        className={`${inputClasses} pr-12 w-full`}
-        value={value}
-        onChange={handleInput}
-        maxLength={11}
-      />
-      {value && (
-        <button
-          type="button"
-          onClick={onToggleVisibility}
-          className="absolute right-3 top-1/2 -translate-y-1/2"
-        >
-          <img
-            src={show ? VisibilityOff : VisibilityOn}
-            alt={show ? "Hide SSN" : "Show SSN"}
-            className="w-5 h-5"
-          />
-        </button>
-      )}
-    </div>
+    <TextField
+      className={className}
+      label="SSN"
+      value={value}
+      placeholder="123-45-6789"
+      onChange={handleInput}
+      type={show ? "text" : "password"}
+      inputProps={{
+        maxLength: 11,
+        inputMode: "numeric",
+        pattern: "\\d*",
+      }}
+      fullWidth
+      variant="outlined"
+      InputProps={{
+        endAdornment: (
+          <InputAdornment position="end">
+            <IconButton onClick={onToggleVisibility} edge="end">
+              <img
+                src={show ? VisibilityOff : VisibilityOn}
+                alt={show ? "Hide SSN" : "Show SSN"}
+                className="w-5 h-5"
+              />
+            </IconButton>
+          </InputAdornment>
+        ),
+      }}
+    />
   );
 };
 
