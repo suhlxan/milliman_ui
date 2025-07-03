@@ -1,33 +1,36 @@
 // src/components/ResultsTab.tsx
-import React, { useState } from "react";
+import React, { useState } from 'react';
+import { Tabs, Tab } from '@mui/material';
 
-const tabs = ["MCID Claims", "Medical Claims", "Pharmacy Claims"];
+const labels = ['MCID Claims', 'Medical Claims', 'Pharmacy Claims'];
 
-const ResultsTab: React.FC = () => {
-    const [selected, setSelected] = useState("MCID Claims");
+export default function ResultsTab() {
+  const [value, setValue] = useState(0);
 
-    return (
-        <div className="border-b border-brand-gray-light mb-6">
-            <div className="flex gap-8">
-                {tabs.map((tab)=> {
-                    const isSelected = selected === tab;
-                    return (
-                        <button
-                            key={tab}
-                            onClick={() => setSelected(tab)}
-                            className={`pb-2 text-h6 transition-colors duration-200 ${
-                                isSelected
-                                ? "text-brand-blacks font-semibold border-b-2 border-brand-blacks"
-                                : "text-brand-primary-blue hover:text-brand-blacks hover:border-brand-blacks border-b-2 border-transparents"
-                            }`}
-                        > 
-                          {tab}
-                        </button>    
-                    );
-                })}
-            </div>
-        </div>
-    )
-};
+  const handleChange = (_: React.SyntheticEvent, newValue: number) => {
+    setValue(newValue);
+  };
 
-export default ResultsTab
+  return (
+    <Tabs
+      value={value}
+      onChange={handleChange}
+      className="border-b border-brand-gray-light mb-6"
+      TabIndicatorProps={{ style: { backgroundColor: '#005BB5', height: '2px' } }}
+      variant="scrollable" // if you have many tabs; optional
+      scrollButtons="auto"
+    >
+      {labels.map((label, idx) => (
+        <Tab
+          key={label}
+          label={label}
+          className={`pb-2 text-h6 transition-colors duration-200 ${
+            value === idx
+              ? 'text-brand-blacks font-semibold'
+              : 'text-brand-primary-blue hover:text-brand-blacks'
+          }`}
+        />
+      ))}
+    </Tabs>
+  );
+}
