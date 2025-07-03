@@ -3,7 +3,7 @@ import React from "react";
 import {
   TextField,
   InputAdornment,
-  IconButton
+  IconButton,
 } from "@mui/material";
 import VisibilityOn from "../assets/images/visibility_on.svg";
 import VisibilityOff from "../assets/images/visibility_off.svg";
@@ -13,8 +13,11 @@ export interface SSNFieldProps {
   show: boolean;
   onChange: (newVal: string) => void;
   onToggleVisibility: () => void;
-  /** any extra classes for spacing, etc */
   className?: string;
+
+
+  error?: boolean;
+  helperText?: React.ReactNode;
 }
 
 const SSNField: React.FC<SSNFieldProps> = ({
@@ -22,20 +25,22 @@ const SSNField: React.FC<SSNFieldProps> = ({
   show,
   onChange,
   onToggleVisibility,
-  className = ""
+  className = "",
+  error = false,
+  helperText,
 }) => {
   const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    // strip non-digits, max 9 chars
     const raw = e.target.value.replace(/\D/g, "").slice(0, 9);
-    // format with dashes
+
     let formatted: string;
     if (raw.length > 5) {
-      formatted = `${raw.slice(0,3)}-${raw.slice(3,5)}-${raw.slice(5)}`;
+      formatted = `${raw.slice(0, 3)}-${raw.slice(3, 5)}-${raw.slice(5)}`;
     } else if (raw.length > 3) {
-      formatted = `${raw.slice(0,3)}-${raw.slice(3)}`;
+      formatted = `${raw.slice(0, 3)}-${raw.slice(3)}`;
     } else {
       formatted = raw;
     }
+
     onChange(formatted);
   };
 
@@ -47,6 +52,8 @@ const SSNField: React.FC<SSNFieldProps> = ({
       placeholder="123-45-6789"
       onChange={handleInput}
       type={show ? "text" : "password"}
+      error={error} 
+      helperText={helperText} 
       inputProps={{
         maxLength: 11,
         inputMode: "numeric",

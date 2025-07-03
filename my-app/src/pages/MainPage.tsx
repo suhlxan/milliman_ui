@@ -24,6 +24,8 @@ export default function MainPage() {
   const [dob, setDob] = useState<Date | null>(null);
   const [zipCode, setZipCode] = useState('');
 
+  const [errors, setErrors] = useState<Record<string, string>>({});
+
   // analysis logic
   const {
     isLoading,
@@ -35,6 +37,25 @@ export default function MainPage() {
   useEffect(() => {
     document.title = 'Elevance Health | Milliman Dashboard';
   }, []);
+
+  const handleExecute = () => {
+    const newErrors: Record<string, string> = {};
+
+    if (!firstName.trim()) newErrors.firstName = "First name is required.";
+    if (!lastName.trim()) newErrors.lastName = "Last name is required.";
+    if (!gender) newErrors.gender = "Gender is required.";
+    if (!dob) newErrors.dob = "Date of birth is required.";
+    if (!zipCode || zipCode.length < 5) newErrors.zipCode = "Enter a valid 5-digit ZIP code.";
+    if (!ssn || ssn.replace(/\D/g, '').length < 9) newErrors.ssn = "Enter a 9-digit SSN.";
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+
+    setErrors({});
+    startAnalysis();
+  };
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -68,6 +89,7 @@ export default function MainPage() {
           setDob={setDob}
           zipCode={zipCode}
           setZipCode={setZipCode}
+          errors={errors}
         />
 
         {/* Age Display */}
@@ -83,7 +105,7 @@ export default function MainPage() {
             <Button
               variant="contained"
               size="large"
-              onClick={startAnalysis}
+              onClick={handleExecute}
               className="bg-brand-primary-blue hover:bg-brand-mediumBlue active:bg-black rounded-full px-12 py-3"
             >
               Execute Health Agent Analysis
