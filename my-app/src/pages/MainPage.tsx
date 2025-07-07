@@ -3,6 +3,7 @@ import {
   Button,
   Typography,
   Box,
+  Paper
 } from '@mui/material';
 
 import NavBar from '../components/NavBar';
@@ -13,6 +14,10 @@ import ResultsTab from '../components/ResultsTab';
 import { useHealthAgentAnalysis } from '../hooks/useHealthAgentAnalysis';
 import { sanitizeName } from '../utils/sanitize';
 import { calculateAge } from '../utils/ageUtils';
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+import PersonIcon from '@mui/icons-material/Person';
+import AssessmentIcon from '@mui/icons-material/Assessment';
+
 
 export default function MainPage() {
   // form state
@@ -25,6 +30,7 @@ export default function MainPage() {
   const [zipCode, setZipCode] = useState('');
 
   const [errors, setErrors] = useState<Record<string, string>>({});
+
 
   // analysis logic
   const {
@@ -64,12 +70,20 @@ export default function MainPage() {
 
       {/* PAGE CONTENT */}
       <div className="max-w-6xl mx-auto px-4 py-12">
-        <Typography component="h2" variant="h4" className="font-bold mb-6">
+
+        {/* <Typography component="h2" variant="h4" className="font-bold mb-6 text-center pb-4">
           Personal Details
-        </Typography>
+        </Typography> */}
+        <Box display="flex" alignItems="center" justifyContent="center" mb={2}>
+          <PersonIcon sx={{ color: '#1a237e', marginRight: 1 }} />
+          <Typography component="h2" variant="h4" className="font-bold">
+            Personal Details
+          </Typography>
+        </Box>
+
         <Typography variant="body1" className="text-gray-600 mb-6">
-          Enter patient information below. This data will be processed through 
-          the Health Agent workflow with AI analysis and will be available for 
+          Enter patient information below. This data will be processed through
+          the Health Agent workflow with AI analysis and will be available for
           interactive chat queries.
         </Typography>
 
@@ -92,15 +106,27 @@ export default function MainPage() {
           errors={errors}
         />
 
-        {/* Age Display */}
+        {/* Calculated Age Box */}
         {dob && (
-          <Typography className="text-h3 mb-1.5 text-gray-600">
-            Calculated Age: {calculateAge(dob.toISOString().split("T")[0])}
-          </Typography>
+          <Box
+            display="flex"
+            alignItems="center"
+            bgcolor="rgb(232, 240, 254)"
+            borderRadius={2}
+            paddingY={2}
+            paddingX={3}
+            marginTop={4}
+            sx={{ width: 'fit-content' }}
+          >
+            <CalendarMonthIcon color="primary" sx={{ marginRight: 1 }} />
+            <Typography variant="body1">
+              <strong>Calculated Age:</strong> {calculateAge(dob.toISOString().split("T")[0])} old
+            </Typography>
+          </Box>
         )}
 
         {/* Execute Button or Loading Bar */}
-        {!isLoading && !submitted ? (
+        {/* {!isLoading && !submitted ? (
           <Box className="flex justify-center mt-12">
             <Button
               variant="contained"
@@ -114,17 +140,69 @@ export default function MainPage() {
         ) : isLoading ? (
           <LoadingBar progress={progress} />
         ) : null}
+         */}
 
-        {/* Results show after loading completes */}
+        {!isLoading && !submitted ? (
+          <Box className="flex justify-center mt-12">
+            <Button
+              variant="contained"
+              size="large"
+              onClick={handleExecute}
+              className="bg-brand-primary-blue hover:bg-brand-mediumBlue active:bg-black rounded-full px-12 py-3"
+            >
+              Execute Health Agent Analysis
+            </Button>
+          </Box>
+        ) : isLoading && !submitted ? (
+          <>
+            {/* Summary Cards */}
+            <Box mt={6} display="flex" flexWrap="wrap" justifyContent="center" gap={2}>
+              {[
+                { label: 'TOTAL STEPS', value: 8 },
+                { label: 'COMPLETED', value: 3 },
+                { label: 'PROCESSING', value: 1 },
+                { label: 'PROGRESS', value: `${progress}%` },
+              ].map((item, index) => (
+                <Box
+                  key={index}
+                  component={Paper}
+                  elevation={3}
+                  sx={{
+                    padding: 2,
+                    width: 150,
+                    textAlign: 'center',
+                    bgcolor: '#e3f2fd',
+                  }}
+                >
+                  <Typography variant="h6" color="primary">
+                    {item.value}
+                  </Typography>
+                  <Typography variant="body2">{item.label}</Typography>
+                </Box>
+              ))}
+            </Box>
+
+            {/* Loader */}
+            <Box mt={4}>
+              <LoadingBar progress={progress} />
+            </Box>
+          </>
+        ) : null}
+
         {submitted && (
           <div className="mt-12">
-            <Typography variant="h3" className="font-semibold text-brand-navy mb-4">
-              Health Agent Analysis Results
-            </Typography>
+            <Box display="flex" alignItems="center" justifyContent="center" mb={2}>
+              <AssessmentIcon fontSize="large" sx={{ color: '#1a237e', marginRight: 1 }} />
+              <Typography variant="h4" className="font-semibold text-brand-navy">
+                Health Agent Analysis Results
+              </Typography>
+            </Box>
             <ResultsTab />
           </div>
         )}
+
       </div>
     </div>
   );
 }
+ 
