@@ -15,6 +15,7 @@ import MonitorHeartIcon from '@mui/icons-material/MonitorHeart'; // For Blood Pr
 
 const TABS = ['MCID Claims', 'Medical Claims', 'Pharmacy Claims'];
 
+
 const apiData = [
   `{
     "src_mbr_first_nm":"[MASKED_NAME]"
@@ -59,12 +60,12 @@ export default function ResultsTab() {
   return (
     <Box className="max-w-6xl mx-auto mt-4">
       {/* Claims Data Header */}
-      <Box className="bg-[#eae7f1] p-2 rounded-2xl shadow-lg " display="flex" alignItems="center" onClick={toggleClaimsOpen} sx={{ cursor: 'pointer' }}>
+      <Box className="bg-white p-2 rounded-2xl shadow-lg " display="flex" alignItems="center" onClick={toggleClaimsOpen} sx={{ cursor: 'pointer' }}>
         <IconButton size="small" className="text-brand-cyan mr-2">
           {claimsOpen ? <ExpandMoreIcon /> : <ChevronRightIcon />}
         </IconButton>
-        <DescriptionIcon sx={{ fontSize: 24, color: '#1a237e', marginRight: 1 }} />
-        <Typography variant="h6" className="font-semibold text-brand-navy">
+        <DescriptionIcon sx={{ fontSize: 24, color: '#1E58AA', marginRight: 1 }} />
+        <Typography variant="h6" className="font-semibold text-brand-mediumBlue">
           Claims Data
         </Typography>
 
@@ -90,7 +91,7 @@ export default function ResultsTab() {
                   key={label}
                   label={label}
                   value={index}
-                  sx={{ '&:hover': { backgroundColor: '#e0f7fa', color: '#007c91', transition: 'all 0.3s ease', }, }}
+                  sx={{ '&:hover': { backgroundColor: 'white', color: '#1355E9', transition: 'all 0.3s ease', }, }}
                 />
               ))}
 
@@ -130,14 +131,15 @@ export default function ResultsTab() {
           </Paper>
         </Box>
       </Collapse>
+      
       {/* Claims Data Extraction Header */}
       <Box mt={6}>
-        <Box className="bg-[#eae7f1] p-2 rounded-2xl shadow-lg" display="flex" alignItems="center" onClick={() => setClaimsExtractionOpen(prev => !prev)} sx={{ cursor: 'pointer' }} >
+        <Box className="bg-white p-2 rounded-2xl shadow-lg" display="flex" alignItems="center" onClick={() => setClaimsExtractionOpen(prev => !prev)} sx={{ cursor: 'pointer' }} >
           <IconButton size="small" className="text-brand-cyan mr-2">
             {claimsExtractionOpen ? <ExpandMoreIcon /> : <ChevronRightIcon />}
           </IconButton>
-          <DatasetIcon sx={{ fontSize: 24, color: '#1a237e', marginRight: 1 }} />
-          <Typography variant="h6" className="font-semibold text-brand-navy">
+          <DatasetIcon sx={{ fontSize: 24, color: '#1E58AA', marginRight: 1 }} />
+          <Typography variant="h6" className="font-semibold text-brand-mediumBlue">
             Claims Data Extraction
           </Typography>
         </Box>
@@ -153,10 +155,10 @@ export default function ResultsTab() {
               variant="fullWidth"
             >
               <Tab label="Medical Claims Extraction"
-                sx={{ '&:hover': { backgroundColor: '#e0f7fa', color: '#007c91', transition: 'all 0.3s ease', }, }}
+                sx={{ '&:hover': { backgroundColor: '#white', color: '#1355E9', transition: 'all 0.3s ease', }, }}
               />
               <Tab label="Pharmacy Claims Extraction"
-                sx={{ '&:hover': { backgroundColor: '#e0f7fa', color: '#007c91', transition: 'all 0.3s ease', }, }}
+                sx={{ '&:hover': { backgroundColor: '#white', color: '#1355E9', transition: 'all 0.3s ease', }, }}
               />
             </Tabs>
 
@@ -210,7 +212,7 @@ export default function ResultsTab() {
       </Box>
       {/* Enhanced Entity Extraction Section */}
       <Box mt={6}>
-        <Box className="bg-[#eae7f1] p-2 rounded-2xl shadow-lg "
+        <Box className="bg-white p-2 rounded-2xl shadow-lg "
           display="flex"
           alignItems="center"
           onClick={() => setEntityExtractionOpen(prev => !prev)}
@@ -220,8 +222,8 @@ export default function ResultsTab() {
             {entityExtractionOpen ? <ExpandMoreIcon /> : <ChevronRightIcon />}
           </IconButton>
          
-          <PrecisionManufacturingIcon sx={{ fontSize: 24, color: '#1a237e', marginRight: 1 }} />
-          <Typography variant="h6" className="font-semibold text-brand-navy">
+          <PrecisionManufacturingIcon sx={{ fontSize: 24, color: '#1E58AA', marginRight: 1 }} />
+          <Typography variant="h6" className="font-semibold text-brand-mediumBlue">
             Enhanced Entity Extraction
           </Typography>
 
@@ -268,7 +270,7 @@ export default function ResultsTab() {
       {/* Health Trajectory Section */}
       <Box mt={6}>
         <Box
-          className="bg-[#eae7f1] p-2 rounded-2xl shadow-lg"
+          className="bg-white p-2 rounded-2xl shadow-lg"
           display="flex"
           alignItems="center"
           onClick={() => setHealthTrajectoryOpen((prev: boolean) => !prev)}
@@ -277,8 +279,8 @@ export default function ResultsTab() {
           <IconButton size="small" className="text-brand-cyan mr-2">
             {healthTrajectoryOpen ? <ExpandMoreIcon /> : <ChevronRightIcon />}
           </IconButton>
-          <TrendingUpIcon sx={{ fontSize: 24, color: '#1a237e', marginRight: 1 }} />
-          <Typography variant="h6" className="font-semibold text-brand-navy">
+          <TrendingUpIcon sx={{ fontSize: 24, color: '#1E58AA', marginRight: 1 }} />
+          <Typography variant="h6" className="font-semibold text-brand-mediumBlue">
             Health Trajectory
           </Typography>
 
@@ -301,7 +303,7 @@ export default function ResultsTab() {
       {/* Final Summary Section */}
       <Box mt={6}>
         <Box
-          className="bg-[#eae7f1] p-2 rounded-2xl shadow-lg"
+          className="bg-white p-2 rounded-2xl shadow-lg"
           display="flex"
           alignItems="center"
           onClick={() => setFinalSummaryOpen((prev: boolean) => !prev)}
@@ -310,8 +312,8 @@ export default function ResultsTab() {
           <IconButton size="small" className="text-brand-cyan mr-2">
             {finalSummaryOpen ? <ExpandMoreIcon /> : <ChevronRightIcon />}
           </IconButton>
-          <SummarizeIcon sx={{ fontSize: 24, color: '#1a237e', marginRight: 1 }} />
-          <Typography variant="h6" className="font-semibold text-brand-navy">
+          <SummarizeIcon sx={{ fontSize: 24, color: '#1E58AA', marginRight: 1 }} />
+          <Typography variant="h6" className="font-semibold text-brand-mediumBlue">
             Final Summary
           </Typography>
 
@@ -334,7 +336,7 @@ export default function ResultsTab() {
       {/* Heart Attack Risk Prediction Section */}
       <Box mt={6}>
         <Box
-          className="bg-[#eae7f1] p-2 rounded-2xl shadow-lg"
+          className="bg-white p-2 rounded-2xl shadow-lg"
           display="flex"
           alignItems="center"
           onClick={() => setHeartRiskOpen((prev: boolean) => !prev)}
@@ -343,7 +345,7 @@ export default function ResultsTab() {
           <IconButton size="small" className="text-brand-cyan mr-2">
             {heartRiskOpen ? <ExpandMoreIcon /> : <ChevronRightIcon />}
           </IconButton>
-          <Typography variant="h6" className="font-semibold text-brand-navy">
+          <Typography variant="h6" className="font-semibold text-brand-mediumBlue">
            ❤️ Heart Attack Risk Prediction
           </Typography>
         </Box>

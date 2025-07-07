@@ -11,16 +11,19 @@ import EHLogo from '../assets/images/EH_Logo.svg';
 import PersonalDetailsForm from '../components/PersonalDetailsForm';
 import LoadingBar from '../components/LoadingBar';
 import ResultsTab from '../components/ResultsTab';
-import { useHealthAgentAnalysis } from '../hooks/useHealthAgentAnalysis';
+
 import { sanitizeName } from '../utils/sanitize';
+import { capitalizeFirstLetter } from '../utils/format';
 import { calculateAge } from '../utils/ageUtils';
+import { useAnalysisRunner } from '../hooks/useAnalysisRunner';
+import { useGsapTextAnimations } from '../hooks/useGsapTextAnimations';
+
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import PersonIcon from '@mui/icons-material/Person';
 import AssessmentIcon from '@mui/icons-material/Assessment';
 
-
 export default function MainPage() {
-  // form state
+  // Form state
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [gender, setGender] = useState('');
@@ -29,51 +32,52 @@ export default function MainPage() {
   const [dob, setDob] = useState<Date | null>(null);
   const [zipCode, setZipCode] = useState('');
 
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  // UI control state
+  const [showStopButton, setShowStopButton] = useState(false);
 
-
-  // analysis logic
+  // useAnalysisRunner hook handles full analysis lifecycle
   const {
     isLoading,
     progress,
     submitted,
-    startAnalysis,
-  } = useHealthAgentAnalysis();
+    errors,
+    execute: handleExecute,
+  } = useAnalysisRunner({
+    formData: { firstName, lastName, gender, dob, zipCode, ssn },
+  });
 
   useEffect(() => {
     document.title = 'Elevance Health | Milliman Dashboard';
   }, []);
 
-  const handleExecute = () => {
-    const newErrors: Record<string, string> = {};
-
-    if (!firstName.trim()) newErrors.firstName = "First name is required.";
-    if (!lastName.trim()) newErrors.lastName = "Last name is required.";
-    if (!gender) newErrors.gender = "Gender is required.";
-    if (!dob) newErrors.dob = "Date of birth is required.";
-    if (!zipCode || zipCode.length < 5) newErrors.zipCode = "Enter a valid 5-digit ZIP code.";
-    if (!ssn || ssn.replace(/\D/g, '').length < 9) newErrors.ssn = "Enter a 9-digit SSN.";
-
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
-      return;
+  useEffect(() => {
+    if (!isLoading || submitted) {
+      setShowStopButton(false);
     }
+  }, [isLoading, submitted]);
 
-    setErrors({});
-    startAnalysis();
+  const handleStart = () => {
+    setShowStopButton(true);
+    handleExecute();
+  };
+
+  const handleStop = () => {
+    setShowStopButton(false);
+    window.location.reload(); // Hard reset, replace with cancellation logic if supported
   };
 
   return (
     <div className="min-h-screen bg-gray-100">
       {/* NAV BAR */}
-      <NavBar logoSrc={EHLogo} />
+      <NavBar
+        logoSrc={EHLogo}
+        onRerun={handleStart}
+        showStopButton={showStopButton}
+        onStop={handleStop}
+      />
 
       {/* PAGE CONTENT */}
       <div className="max-w-6xl mx-auto px-4 py-12">
-
-        {/* <Typography component="h2" variant="h4" className="font-bold mb-6 text-center pb-4">
-          Personal Details
-        </Typography> */}
         <Box display="flex" alignItems="center" justifyContent="center" mb={2}>
           <PersonIcon sx={{ color: '#1a237e', marginRight: 1 }} />
           <Typography component="h2" variant="h4" className="font-bold">
@@ -90,9 +94,9 @@ export default function MainPage() {
         {/* Personal Details Form */}
         <PersonalDetailsForm
           firstName={firstName}
-          setFirstName={(val) => setFirstName(sanitizeName(val))}
+          setFirstName={(val) => setFirstName(capitalizeFirstLetter(sanitizeName(val)))}
           lastName={lastName}
-          setLastName={(val) => setLastName(sanitizeName(val))}
+          setLastName={(val) => setLastName(capitalizeFirstLetter(sanitizeName(val)))}
           gender={gender}
           setGender={setGender}
           ssn={ssn}
@@ -106,12 +110,12 @@ export default function MainPage() {
           errors={errors}
         />
 
-        {/* Calculated Age Box */}
-        {dob && (
+        {/* Calculated Age */}
+        {dob && !isNaN(dob.getTime()) && calculateAge(dob.toISOString().split("T")[0]) && (
           <Box
             display="flex"
             alignItems="center"
-            bgcolor="rgb(232, 240, 254)"
+            className="bg-brand-pale-cyan"
             borderRadius={2}
             paddingY={2}
             paddingX={3}
@@ -125,29 +129,13 @@ export default function MainPage() {
           </Box>
         )}
 
-        {/* Execute Button or Loading Bar */}
-        {/* {!isLoading && !submitted ? (
-          <Box className="flex justify-center mt-12">
-            <Button
-              variant="contained"
-              size="large"
-              onClick={handleExecute}
-              className="bg-brand-primary-blue hover:bg-brand-mediumBlue active:bg-black rounded-full px-12 py-3"
-            >
-              Execute Health Agent Analysis
-            </Button>
-          </Box>
-        ) : isLoading ? (
-          <LoadingBar progress={progress} />
-        ) : null}
-         */}
-
+        {/* Execute Button or Loading/Progress */}
         {!isLoading && !submitted ? (
           <Box className="flex justify-center mt-12">
             <Button
               variant="contained"
               size="large"
-              onClick={handleExecute}
+              onClick={handleStart}
               className="bg-brand-primary-blue hover:bg-brand-mediumBlue active:bg-black rounded-full px-12 py-3"
             >
               Execute Health Agent Analysis
@@ -156,53 +144,68 @@ export default function MainPage() {
         ) : isLoading && !submitted ? (
           <>
             {/* Summary Cards */}
-            <Box mt={6} display="flex" flexWrap="wrap" justifyContent="center" gap={2}>
+            <Box
+              mt={6}
+              display="grid"
+              gridTemplateColumns="repeat(auto-fit, minmax(220px, 1fr))"
+              gap={3}
+            >
               {[
                 { label: 'TOTAL STEPS', value: 8 },
                 { label: 'COMPLETED', value: 3 },
                 { label: 'PROCESSING', value: 1 },
                 { label: 'PROGRESS', value: `${progress}%` },
               ].map((item, index) => (
-                <Box
+                <Paper
                   key={index}
-                  component={Paper}
                   elevation={3}
+                  className="shine-hover"
                   sx={{
-                    padding: 2,
-                    width: 150,
+                    p: 4,
+                    borderRadius: '15px',
                     textAlign: 'center',
-                    bgcolor: '#e3f2fd',
+                    bgcolor: '#ecf8fe',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    transition: 'transform 0.25s ease, box-shadow 0.25s ease',
+                    '&:hover': {
+                      transform: 'scale(1.15)',
+                      boxShadow: 6,
+                    },
                   }}
                 >
-                  <Typography variant="h6" color="primary">
+                  <Typography variant="h4" sx={{ color: '#44B8F3', fontWeight: 'bold' }}>
                     {item.value}
                   </Typography>
-                  <Typography variant="body2">{item.label}</Typography>
-                </Box>
+                  <Typography variant="body2" sx={{ color: '#1E58AA', fontWeight: 'semi-bold' }}>
+                    {item.label}
+                  </Typography>
+                </Paper>
               ))}
             </Box>
 
-            {/* Loader */}
+            {/* Loading Bar */}
             <Box mt={4}>
               <LoadingBar progress={progress} />
             </Box>
           </>
         ) : null}
 
+        {/* Results */}
         {submitted && (
           <div className="mt-12">
             <Box display="flex" alignItems="center" justifyContent="center" mb={2}>
-              <AssessmentIcon fontSize="large" sx={{ color: '#1a237e', marginRight: 1 }} />
-              <Typography variant="h4" className="font-semibold text-brand-navy">
+              <AssessmentIcon fontSize="large" sx={{ color: '#20c997', marginRight: 1 }} />
+              <Typography variant="h4" className="font-semibold text-brand-black">
                 Health Agent Analysis Results
               </Typography>
             </Box>
             <ResultsTab />
           </div>
         )}
-
       </div>
     </div>
   );
 }
- 

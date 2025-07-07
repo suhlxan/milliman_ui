@@ -111,8 +111,8 @@ const PersonalDetailsForm: React.FC<Props> = ({
             onChange={setSSN}
             onToggleVisibility={() => setShowSSN(!showSSN)}
             error={!!errors.ssn}
-            helperText={errors.ssn && <FormError message={errors.ssn} />}
           />
+          {errors.ssn && <FormError message={errors.ssn} />}
         </div>
 
         <div>
@@ -130,11 +130,11 @@ const PersonalDetailsForm: React.FC<Props> = ({
                   className: inputClasses,
                   variant: "outlined",
                   error: !!errors.dob,
-                  helperText: errors.dob ? <FormError message={errors.dob} /> : null,
                 },
               }}
             />
           </LocalizationProvider>
+          {errors.dob && <FormError message={errors.dob} />}
         </div>
 
         <div>
