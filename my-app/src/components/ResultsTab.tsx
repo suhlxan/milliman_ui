@@ -64,8 +64,8 @@ export default function ResultsTab() {
         <IconButton size="small" className="text-brand-cyan mr-2">
           {claimsOpen ? <ExpandMoreIcon /> : <ChevronRightIcon />}
         </IconButton>
-        <DescriptionIcon sx={{ fontSize: 24, color: '#1E58AA', marginRight: 1 }} />
-        <Typography variant="h6" className="font-semibold text-brand-mediumBlue">
+        <DescriptionIcon sx={{ fontSize: 24, color: 'f7c59f' , marginRight: 1 }} />
+        <Typography variant="h6" className="font-semibold text-brand-mediumBlue hover:text-brand-primary-blue transition-colors duration-200">
           Claims Data
         </Typography>
 
@@ -74,9 +74,9 @@ export default function ResultsTab() {
       {/* Collapsible Claims Section */}
       <Collapse in={claimsOpen} unmountOnExit>
         <Box mt={3}>
-          <Typography variant="h6" className="mb-2 text-brand-navy pb-2">
+          {/* <Typography variant="h6" className="mb-2 text-brand-navy pb-2">
             Deidentified Claims Data
-          </Typography>
+          </Typography> */}
 
           <Paper elevation={2} className="p-4 rounded-xl">
             <Tabs
@@ -138,8 +138,8 @@ export default function ResultsTab() {
           <IconButton size="small" className="text-brand-cyan mr-2">
             {claimsExtractionOpen ? <ExpandMoreIcon /> : <ChevronRightIcon />}
           </IconButton>
-          <DatasetIcon sx={{ fontSize: 24, color: '#1E58AA', marginRight: 1 }} />
-          <Typography variant="h6" className="font-semibold text-brand-mediumBlue">
+          <DatasetIcon sx={{ fontSize: 24, color: '#1e90ff', marginRight: 1 }} />
+          <Typography variant="h6" className="font-semibold text-brand-mediumBlue  hover:text-brand-primary-blue transition-colors duration-200">
             Claims Data Extraction
           </Typography>
         </Box>
@@ -223,7 +223,7 @@ export default function ResultsTab() {
           </IconButton>
          
           <PrecisionManufacturingIcon sx={{ fontSize: 24, color: '#1E58AA', marginRight: 1 }} />
-          <Typography variant="h6" className="font-semibold text-brand-mediumBlue">
+          <Typography variant="h6" className="font-semibold text-brand-mediumBlue  hover:text-brand-primary-blue transition-colors duration-200">
             Enhanced Entity Extraction
           </Typography>
 
@@ -232,11 +232,11 @@ export default function ResultsTab() {
         <Collapse in={entityExtractionOpen} unmountOnExit>
           <Box mt={3} display="flex" gap={4} flexWrap="wrap">
             {[
-              { label: 'Diabetes', value: 'NO', icon: <HealingIcon sx={{ color: '#1a237e', mr: 1 }} /> },
-              { label: 'Age Group', value: 'UNKNOWN', icon: <ElderlyIcon sx={{ color: '#1a237e', mr: 1 }} /> },
-              { label: 'Smoking', value: 'NO', icon: <SmokingRoomsIcon sx={{ color: '#1a237e', mr: 1 }} /> },
-              { label: 'Alcohol', value: 'NO', icon: <LiquorIcon sx={{ color: '#1a237e', mr: 1 }} /> },
-              { label: 'Blood Pressure', value: 'UNKNOWN', icon: <MonitorHeartIcon sx={{ color: '#1a237e', mr: 1 }} /> },
+              { label: 'Diabetes', value: 'NO', icon: <HealingIcon sx={{ color: '#d81b60', mr: 1 }} /> },
+              { label: 'Age Group', value: 'UNKNOWN', icon: <ElderlyIcon sx={{ color: '#6d4c41', mr: 1 }} /> },
+              { label: 'Smoking', value: 'NO', icon: <SmokingRoomsIcon sx={{ color: '#607d8b', mr: 1 }} /> },
+              { label: 'Alcohol', value: 'NO', icon: <LiquorIcon sx={{ color: '#673ab7', mr: 1 }} /> },
+              { label: 'Blood Pressure', value: 'UNKNOWN', icon: <MonitorHeartIcon sx={{ color: '#e53935', mr: 1 }} /> },
             ].map((item, index) => (
               <Paper
                 key={index}
@@ -279,8 +279,8 @@ export default function ResultsTab() {
           <IconButton size="small" className="text-brand-cyan mr-2">
             {healthTrajectoryOpen ? <ExpandMoreIcon /> : <ChevronRightIcon />}
           </IconButton>
-          <TrendingUpIcon sx={{ fontSize: 24, color: '#1E58AA', marginRight: 1 }} />
-          <Typography variant="h6" className="font-semibold text-brand-mediumBlue">
+          <TrendingUpIcon sx={{ fontSize: 24, color: '#9C27B0' , marginRight: 1 }} />
+          <Typography variant="h6" className="font-semibold text-brand-mediumBlue  hover:text-brand-primary-blue transition-colors duration-200">
             Health Trajectory
           </Typography>
 
@@ -312,8 +312,8 @@ export default function ResultsTab() {
           <IconButton size="small" className="text-brand-cyan mr-2">
             {finalSummaryOpen ? <ExpandMoreIcon /> : <ChevronRightIcon />}
           </IconButton>
-          <SummarizeIcon sx={{ fontSize: 24, color: '#1E58AA', marginRight: 1 }} />
-          <Typography variant="h6" className="font-semibold text-brand-mediumBlue">
+          <SummarizeIcon sx={{ fontSize: 24, color: '#009688', marginRight: 1 }} />
+          <Typography variant="h6" className="font-semibold text-brand-mediumBlue  hover:text-brand-primary-blue transition-colors duration-200">
             Final Summary
           </Typography>
 
@@ -345,7 +345,7 @@ export default function ResultsTab() {
           <IconButton size="small" className="text-brand-cyan mr-2">
             {heartRiskOpen ? <ExpandMoreIcon /> : <ChevronRightIcon />}
           </IconButton>
-          <Typography variant="h6" className="font-semibold text-brand-mediumBlue">
+          <Typography variant="h6" className="font-semibold text-brand-mediumBlue  hover:text-brand-primary-blue transition-colors duration-200">
            ❤️ Heart Attack Risk Prediction
           </Typography>
         </Box>

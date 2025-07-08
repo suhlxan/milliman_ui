@@ -17,10 +17,14 @@ import { capitalizeFirstLetter } from '../utils/format';
 import { calculateAge } from '../utils/ageUtils';
 import { useAnalysisRunner } from '../hooks/useAnalysisRunner';
 import { useGsapTextAnimations } from '../hooks/useGsapTextAnimations';
+import AdvancedWorkflowContainer from '../components/AdvancedWorkflowContainer';
+
 
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import PersonIcon from '@mui/icons-material/Person';
 import AssessmentIcon from '@mui/icons-material/Assessment';
+import WorkflowStatusList from '../components/WorkflowStatusList';
+
 
 export default function MainPage() {
   // Form state
@@ -63,7 +67,7 @@ export default function MainPage() {
 
   const handleStop = () => {
     setShowStopButton(false);
-    window.location.reload(); // Hard reset, replace with cancellation logic if supported
+    window.location.reload(); // Hard reset, replace with cancellation logic if needed
   };
 
   return (
@@ -120,7 +124,16 @@ export default function MainPage() {
             paddingY={2}
             paddingX={3}
             marginTop={4}
-            sx={{ width: 'fit-content' }}
+            sx={{
+              width: 'fit-content',
+              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)', // subtle elevation
+              transition: 'box-shadow 0.3s ease, transform 0.3s ease',
+              '&:hover': {
+                boxShadow: '0 8px 20px rgba(0, 0, 0, 0.15)',
+                transform: 'translateY(-2px)',
+              },
+              cursor: 'default',
+            }}
           >
             <CalendarMonthIcon color="primary" sx={{ marginRight: 1 }} />
             <Typography variant="body1">
@@ -143,7 +156,9 @@ export default function MainPage() {
           </Box>
         ) : isLoading && !submitted ? (
           <>
-            {/* Summary Cards */}
+            {/* ✨ Visual Container Above the Cards */}
+            <AdvancedWorkflowContainer />
+
             <Box
               mt={6}
               display="grid"
@@ -186,10 +201,15 @@ export default function MainPage() {
               ))}
             </Box>
 
-            {/* Loading Bar */}
+
             <Box mt={4}>
               <LoadingBar progress={progress} />
             </Box>
+
+
+            {/* 👇 Add this below the loader */}
+            <WorkflowStatusList />
+
           </>
         ) : null}
 
@@ -209,3 +229,4 @@ export default function MainPage() {
     </div>
   );
 }
+ 
