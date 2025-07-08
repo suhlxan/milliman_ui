@@ -1,3 +1,4 @@
+//components/LoadingBar.tsx
 import React from 'react';
 import { Box, LinearProgress } from '@mui/material';
 

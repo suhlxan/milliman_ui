@@ -11,6 +11,7 @@ import EHLogo from '../assets/images/EH_Logo.svg';
 import PersonalDetailsForm from '../components/PersonalDetailsForm';
 import LoadingBar from '../components/LoadingBar';
 import ResultsTab from '../components/ResultsTab';
+import ChatbotPanel from '../components/ChatbotPanel';
 
 import { sanitizeName } from '../utils/sanitize';
 import { capitalizeFirstLetter } from '../utils/format';
@@ -156,7 +157,7 @@ export default function MainPage() {
           </Box>
         ) : isLoading && !submitted ? (
           <>
-            {/* ✨ Visual Container Above the Cards */}
+            {/* Visual Container Above the Cards */}
             <AdvancedWorkflowContainer />
 
             <Box
@@ -206,8 +207,6 @@ export default function MainPage() {
               <LoadingBar progress={progress} />
             </Box>
 
-
-            {/* 👇 Add this below the loader */}
             <WorkflowStatusList />
 
           </>
@@ -226,6 +225,10 @@ export default function MainPage() {
           </div>
         )}
       </div>
+
+      {/* Medical Assistant */}
+      <ChatbotPanel visible={submitted} />
+
     </div>
   );
 }
