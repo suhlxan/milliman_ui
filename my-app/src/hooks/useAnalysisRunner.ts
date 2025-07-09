@@ -86,5 +86,7 @@ export function useAnalysisRunner({
     submitted,
     errors,
     execute,
+    setSubmitted,
   };
 }
+ 

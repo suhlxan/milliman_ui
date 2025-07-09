@@ -14,9 +14,11 @@ import ChatInputBar from './ChatInputBar';
 
 interface ChatbotPanelProps {
   visible: boolean; // true when submitted === true
+  onClose?: () => void;
 }
 
-const ChatbotPanel: React.FC<ChatbotPanelProps> = ({ visible }) => {
+// const ChatbotPanel: React.FC<ChatbotPanelProps> = ({ visible }) => {
+const ChatbotPanel: React.FC<ChatbotPanelProps> = ({ visible, onClose }) => {
   const [shouldRender, setShouldRender] = useState(false);
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState('');
@@ -24,15 +26,23 @@ const ChatbotPanel: React.FC<ChatbotPanelProps> = ({ visible }) => {
   const [showSuggestions, setShowSuggestions] = useState(true);
 
   // Delay appearance after analysis is done
+  // useEffect(() => {
+  //   if (visible) {
+  //     const delay = setTimeout(() => {
+  //       setShouldRender(true);
+  //       setOpen(true); // auto-open first time
+  //     // }, 2000);
+  //   }, 1000);
+  //     return () => clearTimeout(delay);
+  //   }
+  // }, [visible]);
   useEffect(() => {
     if (visible) {
-      const delay = setTimeout(() => {
-        setShouldRender(true);
-        setOpen(true); // auto-open first time
-      }, 2000);
-      return () => clearTimeout(delay);
+      setShouldRender(true);
+      setOpen(true); // open immediately
     }
   }, [visible]);
+  
 
   if (!shouldRender) return null;
 
@@ -67,12 +77,12 @@ const ChatbotPanel: React.FC<ChatbotPanelProps> = ({ visible }) => {
       <Box
         sx={{
           position: 'fixed',
-          top: 0,
+          top: 50,
           left: open ? 0 : '-100%',
           opacity: open ? 1 : 0,
           transition: 'left 0.5s ease, opacity 0.5s ease',
           width: 360,
-          height: '100%',
+          height: 'calc(100% - 50px)',
           backgroundColor: '#fff',
           boxShadow: 6,
           zIndex: 1100,
@@ -83,7 +93,9 @@ const ChatbotPanel: React.FC<ChatbotPanelProps> = ({ visible }) => {
         {/* Header */}
         <Box
           sx={{
-            p: 2,
+            pt: 4, // 👈 Add top padding
+            pb: 2,
+            px: 2,
             bgcolor: '#ffffff',
             borderBottom: '1px solid #e0e0e0',
             display: 'flex',
@@ -92,7 +104,8 @@ const ChatbotPanel: React.FC<ChatbotPanelProps> = ({ visible }) => {
           }}
         >
           <Typography fontWeight={600}>Medical Assistant</Typography>
-          <IconButton onClick={() => setOpen(false)}>
+          {/* <IconButton onClick={() => setOpen(false)}> */}
+          <IconButton onClick={onClose}>
             <CloseIcon />
           </IconButton>
         </Box>
@@ -208,3 +221,4 @@ const ChatbotPanel: React.FC<ChatbotPanelProps> = ({ visible }) => {
 };
 
 export default ChatbotPanel;
+ 
