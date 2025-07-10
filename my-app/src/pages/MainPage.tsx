@@ -281,7 +281,7 @@ export default function MainPage() {
                 <Box display="flex" alignItems="center" justifyContent="center" mb={2}>
                   <AssessmentIcon fontSize="large" sx={{ color: '#20c997', marginRight: 1 }} />
                   <Typography variant="h4" className="font-semibold text-brand-black">
-                    Health Agent Analysis Results
+                    Health Agent   Analysis Results
                   </Typography>
                 </Box>
                 <ResultsTab />
