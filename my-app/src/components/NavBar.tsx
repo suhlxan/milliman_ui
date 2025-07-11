@@ -50,8 +50,8 @@ const NavBar: React.FC<NavBarProps> = ({
       <div className="w-full px-6 py-4 flex items-center justify-between relative">
         <img src={logoSrc} alt={altText} className="h-12 object-contain cursor-pointer" 
              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth'})}/>
-        <h1 className="absolute left-1/2 transform -translate-x-1/2 text-white text-3xl font-semibold tracking-wide">
-          Milliman Health Dashboard
+        <h1 className="absolute left-1/2 transform -translate-x-1/2 text-white text-2xl font-semibold tracking-wide">
+          Deep Research Health Agent
         </h1>
 
         <div className="flex items-center gap-3">

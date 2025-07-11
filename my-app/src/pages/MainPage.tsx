@@ -156,7 +156,7 @@ export default function MainPage() {
             <Box display="flex" alignItems="center" justifyContent="center" mb={2}>
               <PersonIcon sx={{ color: '#1a237e', marginRight: 1 }} />
               <Typography component="h2" variant="h4" className="font-bold">
-                Personal Details
+                Patient Information
               </Typography>
             </Box>
 
@@ -219,7 +219,7 @@ export default function MainPage() {
                   onClick={handleStart}
                   className="bg-brand-primary-blue hover:bg-brand-mediumBlue active:bg-black rounded-full px-12 py-3"
                 >
-                  Execute Health Agent Analysis
+                  Execute Health Agent
                 </Button>
               </Box>
             ) : isLoading && !submitted ? (
