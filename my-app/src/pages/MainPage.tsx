@@ -6,18 +6,17 @@ import {
   Paper
 } from '@mui/material';
 
-import NavBar from '../components/NavBar';
+import NavBar from '../components/navbar/NavBar';
 import EHLogo from '../assets/images/EH_Logo.svg';
 import PersonalDetailsForm from '../components/PersonalDetailsForm';
 import LoadingBar from '../components/LoadingBar';
 import ResultsTab from '../components/ResultsTab';
-import ChatbotPanel from '../components/ChatbotPanel';
+import ChatbotPanel from '../components/chatbot/ChatbotPanel';
 
 import { sanitizeName } from '../utils/sanitize';
 import { capitalizeFirstLetter } from '../utils/format';
 import { calculateAge } from '../utils/ageUtils';
 import { useAnalysisRunner } from '../hooks/useAnalysisRunner';
-import { useGsapTextAnimations } from '../hooks/useGsapTextAnimations';
 import AdvancedWorkflowContainer from '../components/AdvancedWorkflowContainer';
 
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
@@ -40,7 +39,6 @@ export default function MainPage() {
   const [zipCode, setZipCode] = useState('');
   const [chatOpen, setChatOpen] = useState(false);
   const [isChatVisible, setIsChatVisible] = useState(true);
-
 
   // UI control state
   const [showStopButton, setShowStopButton] = useState(false);

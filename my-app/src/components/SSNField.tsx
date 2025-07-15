@@ -8,16 +8,15 @@ import {
 import VisibilityOn from "../assets/images/visibility_on.svg";
 import VisibilityOff from "../assets/images/visibility_off.svg";
 
+// Props definition for the SSNField component
 export interface SSNFieldProps {
-  value: string;
-  show: boolean;
-  onChange: (newVal: string) => void;
-  onToggleVisibility: () => void;
-  className?: string;
-
-
-  error?: boolean;
-  helperText?: React.ReactNode;
+  value: string;                      // Current SSN value (formatted)
+  show: boolean;                      // Whether the SSN is visible or masked
+  onChange: (newVal: string) => void; // Callback for when the input changes
+  onToggleVisibility: () => void;     // Callback to toggle SSN visibility
+  className?: string;                 // Optional class for styling
+  error?: boolean;                    // Whether the input is in an error state
+  helperText?: React.ReactNode;       // Helper text (e.g., error messages)
 }
 
 const SSNField: React.FC<SSNFieldProps> = ({
@@ -29,6 +28,13 @@ const SSNField: React.FC<SSNFieldProps> = ({
   error = false,
   helperText,
 }) => {
+
+  /**
+   * Handle user input and format it as an SSN.
+   * - Removes non-digit characters
+   * - Limits to 9 digits
+   * - Formats as XXX-XX-XXXX
+   */
   const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const raw = e.target.value.replace(/\D/g, "").slice(0, 9);
 
@@ -51,19 +57,20 @@ const SSNField: React.FC<SSNFieldProps> = ({
       value={value}
       placeholder="123-45-6789"
       onChange={handleInput}
-      type={show ? "text" : "password"}
-      error={error} 
-      helperText={helperText} 
+      type={show ? "text" : "password"} // Mask or unmask based on `show`
+      error={error}
+      helperText={helperText}
       inputProps={{
-        maxLength: 11,
-        inputMode: "numeric",
-        pattern: "\\d*",
+        maxLength: 11,            
+        inputMode: "numeric",     
+        pattern: "\\d*",          // Numeric pattern for validation
       }}
       fullWidth
       variant="outlined"
       InputProps={{
         endAdornment: (
           <InputAdornment position="end">
+            {/* Toggle visibility icon */}
             <IconButton onClick={onToggleVisibility} edge="end">
               <img
                 src={show ? VisibilityOff : VisibilityOn}

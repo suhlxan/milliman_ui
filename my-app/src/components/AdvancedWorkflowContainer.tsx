@@ -1,11 +1,25 @@
-//components/AdvancedWorkflowContainer.tsx
+// components/AdvancedWorkflowContainer.tsx
+
 import { Box } from '@mui/material';
 import React from 'react';
 
-// In AdvancedWorkflowContainer.tsx
+/**
+ * AdvancedWorkflowContainer
+ * ---------------------------------------------------------------------
+ * A visually enhanced container designed to wrap advanced workflow components.
+ * Includes a gradient background, layered effects, and shimmer animation.
+ * 
+ * Props:
+ * - children: any React content to render inside the container
+ * 
+ * Style Notes:
+ * - Combines Material UI `Box` with custom CSS for effects like radial glow and shimmer
+ * - Ensures high visual impact without interfering with child interactions
+ */
 const AdvancedWorkflowContainer = ({ children }: { children?: React.ReactNode }) => {
   return (
     <>
+      {/* Outer styled container with gradients and shadows */}
       <Box
         className="advanced-workflow-container"
         sx={{
@@ -25,8 +39,10 @@ const AdvancedWorkflowContainer = ({ children }: { children?: React.ReactNode })
         {children}
       </Box>
 
+      {/* Custom pseudo-element styling for animated effects */}
       <style>
         {`
+          /* Rotating radial glow layer */
           .advanced-workflow-container::before {
             content: '';
             position: absolute;
@@ -40,6 +56,7 @@ const AdvancedWorkflowContainer = ({ children }: { children?: React.ReactNode })
             z-index: 0;
           }
 
+          /* Shimmering light sweep */
           .advanced-workflow-container::after {
             content: '';
             position: absolute;
@@ -53,6 +70,7 @@ const AdvancedWorkflowContainer = ({ children }: { children?: React.ReactNode })
             z-index: 0;
           }
 
+          /* Animation keyframes */
           @keyframes rotate {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
@@ -68,6 +86,4 @@ const AdvancedWorkflowContainer = ({ children }: { children?: React.ReactNode })
   );
 };
 
-
 export default AdvancedWorkflowContainer;
- 

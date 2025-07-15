@@ -1,15 +1,25 @@
-//components/LoadingBar.tsx
+// components/LoadingBar.tsx
+
 import React from 'react';
 import { Box, LinearProgress } from '@mui/material';
 
+// Props for the LoadingBar component
 interface LoadingBarProps {
-  progress: number;
-  className?: string;
+  progress: number;        // Current progress (0–100)
+  className?: string;      // Optional custom class for positioning
 }
 
+/**
+ * LoadingBar Component
+ * ------------------------------------------------------------------------------
+ * A stylized progress bar with glow and shimmer effects.
+ * Currently uses a fixed progress value, but designed for future integration
+ * with live API updates (e.g., to reflect step-by-step workflow loading).
+ */
 const LoadingBar: React.FC<LoadingBarProps> = ({ progress, className = '' }) => {
   return (
     <Box className={`mt-12 ${className}`}>
+      {/* Outer container with semi-transparent background and padding */}
       <Box
         className="progress-bar-wrapper"
         sx={{
@@ -21,6 +31,7 @@ const LoadingBar: React.FC<LoadingBarProps> = ({ progress, className = '' }) => 
           border: '1px solid rgba(0, 0, 0, 0.1)',
         }}
       >
+        {/* Wrapper for the actual LinearProgress component */}
         <Box
           className="progress-bar-fill"
           sx={{
@@ -45,9 +56,10 @@ const LoadingBar: React.FC<LoadingBarProps> = ({ progress, className = '' }) => 
         </Box>
       </Box>
 
-      {/* Keyframes and shimmer overlay */}
+      {/* Shimmer and animation keyframes injected inline for flexibility */}
       <style>
         {`
+          /* Shimmer overlay pass on top of the progress bar */
           .progress-bar-fill::before {
             content: '';
             position: absolute;
@@ -60,12 +72,14 @@ const LoadingBar: React.FC<LoadingBarProps> = ({ progress, className = '' }) => 
             pointer-events: none;
           }
 
+          /* Gradient animation that loops background movement */
           @keyframes glowMove {
             0% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
             100% { background-position: 0% 50%; }
           }
 
+          /* White light shimmer moving across the bar */
           @keyframes progress-shine {
             0% { transform: translateX(-100%); }
             100% { transform: translateX(100%); }
@@ -77,4 +91,3 @@ const LoadingBar: React.FC<LoadingBarProps> = ({ progress, className = '' }) => 
 };
 
 export default LoadingBar;
- 
