@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, forwardRef } from 'react';
 import {
   Button,
   Typography,
@@ -26,6 +26,7 @@ import WorkflowStatusList from '../components/WorkflowStatusList';
 import IconButton from '@mui/material/IconButton';
 import SmartToyIcon from '@mui/icons-material/SmartToy';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import DraggableChatbotPanel from '../components/DraggableChatbotPanel';
 
 export default function MainPage() {
   // Form state
@@ -38,6 +39,7 @@ export default function MainPage() {
   const [zipCode, setZipCode] = useState('');
   const [chatOpen, setChatOpen] = useState(false);
   const [isChatVisible, setIsChatVisible] = useState(true);
+  const [sidebarWidth, setSidebarWidth] = useState(300);
 
   // UI control state
   const [showStopButton, setShowStopButton] = useState(false);
@@ -74,7 +76,12 @@ export default function MainPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    // <div
+    //   className="min-h-screen bg-gray-100">
+    <div
+      className="min-h-screen bg-gray-100"
+      style={{ marginLeft: submitted && isChatVisible ? `${sidebarWidth}px` : 0 }}
+    >
       {/* NAV BAR */}
       <NavBar
         logoSrc={EHLogo}
@@ -94,22 +101,11 @@ export default function MainPage() {
         >
           {/* Chatbot Panel (only when submitted) */}
           {submitted && isChatVisible && (
-            <Box
-              flexBasis="300px"
-              flexShrink={0}
-              sx={{
-                position: 'sticky',
-                top: 100,
-                height: 'fit-content',
-                paddingRight: 2,
-                transition: 'all 0.3s ease',
-              }}
-            >
-              <ChatbotPanel
-                visible={submitted}
-                onClose={() => setIsChatVisible(false)}
-              />
-            </Box>
+            <DraggableChatbotPanel
+              visible={submitted && isChatVisible}
+              onClose={() => setIsChatVisible(false)}
+              onWidthChange={(w) => setSidebarWidth(w)}
+            />
           )}
 
           {submitted && !isChatVisible && (

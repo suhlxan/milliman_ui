@@ -14,9 +14,10 @@ import ChatClearButton from './ChatClearButton';
 interface ChatbotPanelProps {
   visible: boolean;
   onClose?: () => void;
+  width?: number;
 }
 
-const ChatbotPanel: React.FC<ChatbotPanelProps> = ({ visible, onClose }) => {
+const ChatbotPanel: React.FC<ChatbotPanelProps> = ({ visible, onClose, width }) => {
   const [shouldRender, setShouldRender] = useState(false); // controls whether panel is mounted
   const [open, setOpen] = useState(false); // controls panel open/closed state
 
@@ -71,12 +72,12 @@ const ChatbotPanel: React.FC<ChatbotPanelProps> = ({ visible, onClose }) => {
       <Box
         sx={{
           position: 'fixed',
-          top: 50,
-          left: open ? 0 : '-100%',
+          top: 0,
+          left: open ? 0 : `-${width ?? 400}px`,
           opacity: open ? 1 : 0,
-          transition: 'left 0.5s ease, opacity 0.5s ease',
-          width: 360,
-          height: 'calc(100% - 50px)',
+          transition: 'opacity 0.3s ease',
+          width: width ?? 400,
+          height: '100%',
           backgroundColor: '#fff',
           boxShadow: 6,
           zIndex: 1100,
