@@ -10,6 +10,7 @@ import ChatHeader from './ChatHeader';
 import ChatIntro from './ChatIntro';
 import ChatSuggestions from './ChatSuggestions';
 import ChatClearButton from './ChatClearButton';
+import QuickAccordionSection from './QuickAccordionSection';
 
 interface ChatbotPanelProps {
   visible: boolean;
@@ -83,6 +84,31 @@ const ChatbotPanel: React.FC<ChatbotPanelProps> = ({ visible, onClose, width }) 
           zIndex: 1100,
           display: 'flex',
           flexDirection: 'column',
+
+          // Scroll settings applied to entire panel
+          overflowY: 'auto',
+          WebkitOverflowScrolling: 'touch',
+
+          // 👇 Custom scrollbar styles
+          '&::-webkit-scrollbar': {
+            width: '0px',
+            transition: 'width 0.3s ease-in-out',
+          },
+          '&:hover::-webkit-scrollbar': {
+            width: '6px',
+          },
+          '&::-webkit-scrollbar-track': {
+            backgroundColor: '#f0f0f0',
+            borderRadius: '4px',
+          },
+          '&::-webkit-scrollbar-thumb': {
+            backgroundColor: '#b0b0b0',
+            borderRadius: '4px',
+          },
+          '&::-webkit-scrollbar-thumb:hover': {
+            backgroundColor: '#888888',
+          },
+
         }}
       >
         {/* Header with title and close button */}
@@ -96,7 +122,7 @@ const ChatbotPanel: React.FC<ChatbotPanelProps> = ({ visible, onClose, width }) 
           sx={{
             flex: 1,
             px: 2,
-            overflowY: 'auto',
+            //overflowY: 'auto',
             display: 'flex',
             flexDirection: 'column',
             gap: 1,
@@ -114,7 +140,20 @@ const ChatbotPanel: React.FC<ChatbotPanelProps> = ({ visible, onClose, width }) 
         </Box>
 
         {/* Suggestion prompts (only shown initially) */}
-        {showSuggestions && <ChatSuggestions onSelect={setInput} />}
+        {/* {showSuggestions && <ChatSuggestions onSelect={setInput} />} */}
+        {showSuggestions && (
+          <>
+            <ChatSuggestions onSelect={setInput} />
+
+            {/* Separator line */}
+            <Box sx={{ px: 2, py: 1 }}>
+              <Box sx={{ height: '1px', backgroundColor: '#E0E0E0', my: 2 }} />
+            </Box>
+
+            {/* Quick Questions Accordion */}
+            <QuickAccordionSection onSelect={setInput} />
+          </>
+        )}
 
         {/* Chat input area */}
         <ChatInputBar value={input} onChange={setInput} onSend={handleSend} />

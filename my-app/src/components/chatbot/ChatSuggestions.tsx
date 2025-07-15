@@ -17,9 +17,9 @@ import { Box } from '@mui/material';
 const ChatSuggestions: React.FC<{ onSelect: (text: string) => void }> = ({ onSelect }) => {
   // TODO: Replace with dynamic suggestions from API when available.
   const suggestions = [
-    'Show me my active medications.',
-    'What is my current heart risk score?',
-    'Provide me my medical summary.',
+    '👋 Hello! I can answer questions about the claims data analysis. Ask me anything!',
+    '💡 Special Feature: Ask about heart attack risk and I will provide both ML model predictions and comprehensive LLM analysis for comparison!',
+    '🎨 Try: Ask me to "show medication timeline" or "generate risk dashboard" for visualizations!',
   ];
 
   return (
@@ -57,3 +57,4 @@ const ChatSuggestions: React.FC<{ onSelect: (text: string) => void }> = ({ onSel
 };
 
 export default ChatSuggestions;
+ 
