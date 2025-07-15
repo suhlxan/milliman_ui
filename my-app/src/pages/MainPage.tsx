@@ -25,8 +25,7 @@ import AssessmentIcon from '@mui/icons-material/Assessment';
 import WorkflowStatusList from '../components/WorkflowStatusList';
 import IconButton from '@mui/material/IconButton';
 import SmartToyIcon from '@mui/icons-material/SmartToy';
-
-
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 
 export default function MainPage() {
   // Form state
@@ -67,7 +66,6 @@ export default function MainPage() {
   const handleStart = () => {
     setShowStopButton(true);
     handleExecute();
-
   };
 
   const handleStop = () => {
@@ -95,21 +93,6 @@ export default function MainPage() {
           width="100%"
         >
           {/* Chatbot Panel (only when submitted) */}
-          {/* {submitted && (
-            <Box
-              flexBasis="300px"
-              flexShrink={0}
-              sx={{
-                position: 'sticky',
-                top: 100,
-                height: 'fit-content',
-                paddingRight: 2, // Add spacing between chatbot and main content
-              }}
-            >
-              <ChatbotPanel visible={submitted} />
-              
-            </Box>
-          )} */}
           {submitted && isChatVisible && (
             <Box
               flexBasis="300px"
@@ -145,8 +128,6 @@ export default function MainPage() {
               <SmartToyIcon />
             </IconButton>
           )}
-
-
 
           {/* Patient Details and Analysis */}
           {/* <Box flex={2}> */}
@@ -215,7 +196,9 @@ export default function MainPage() {
                   variant="contained"
                   size="large"
                   onClick={handleStart}
-                  className="bg-brand-primary-blue hover:bg-brand-mediumBlue active:bg-black rounded-full px-12 py-3"
+                  // className="bg-brand-primary-blue hover:bg-brand-mediumBlue active:bg-black rounded-full px-12 py-3"
+                  startIcon={<PlayArrowIcon />} 
+                  className="bg-gradient-to-r from-brand-primary-blue to-brand-mediumBlue hover:from-brand-mediumBlue hover:to-brand-primary-blue active:scale-95 transition-transform duration-200 shadow-lg rounded-full px-12 py-3 text-white font-semibold"
                 >
                   Execute Health Agent
                 </Button>
