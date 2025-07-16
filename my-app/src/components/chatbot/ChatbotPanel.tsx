@@ -9,7 +9,7 @@ import ChatIntro from './ChatIntro';
 import ChatSuggestions from './ChatSuggestions';
 import ChatClearButton from './ChatClearButton';
 import QuickAccordionSection from './QuickAccordionSection';
-import { chatbotToggleButton }  from '../../pages/styles';
+import { chatbotToggleButton } from '../../pages/styles';
 
 import * as chatStyles from './styles';
 
@@ -25,7 +25,7 @@ const ChatbotPanel: React.FC<ChatbotPanelProps> = ({ visible, onClose, width }) 
 
   // Chat state
   const [input, setInput] = useState('');
-  const [messages, setMessages] = useState<{ text: string; fromUser: boolean }[]>([]);
+  const [messages, setMessages] = useState<{ text: string; fromUser: boolean; type?: string }[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(true);
 
   useEffect(() => {
@@ -39,9 +39,22 @@ const ChatbotPanel: React.FC<ChatbotPanelProps> = ({ visible, onClose, width }) 
 
   const handleSend = () => {
     if (!input.trim()) return;
-    setMessages((prev) => [...prev, { text: input, fromUser: true }]);
+
+    const userMessage = { text: input, fromUser: true };
+    setMessages((prev) => [...prev, userMessage]);
     setInput('');
     setShowSuggestions(false);
+
+    // Hardcoded response for blood sample question
+    if (input.toLowerCase().includes('blood sample')) {
+      const assistantResponse = {
+        text: 'Based on the complete deidentified claims data, there are 0 medical service records and 0 pharmacy records available for this patient. There is no information in the data indicating that the patient has had any blood samples taken. No dates, codes, or procedures related to blood sampling are present in the claims data.',
+        fromUser: false,
+        type: 'assistant-info',
+      };
+
+      setMessages((prev) => [...prev, assistantResponse]);
+    }
   };
 
   const clearChat = () => {
@@ -53,10 +66,7 @@ const ChatbotPanel: React.FC<ChatbotPanelProps> = ({ visible, onClose, width }) 
     <>
       {/* Floating open icon when chat is closed */}
       {!open && (
-        <IconButton
-          onClick={() => setOpen(true)}
-          sx={chatbotToggleButton}
-        >
+        <IconButton onClick={() => setOpen(true)} sx={chatbotToggleButton}>
           <SmartToyIcon />
         </IconButton>
       )}
@@ -68,27 +78,48 @@ const ChatbotPanel: React.FC<ChatbotPanelProps> = ({ visible, onClose, width }) 
 
         <Box sx={chatStyles.chatMessagesContainer}>
           {messages.length === 0 ? (
-            <Box sx={chatStyles.emptyChatMessage}>
-              Ask a question to begin.
-            </Box>
+            <Box sx={chatStyles.emptyChatMessage}>Ask a question to begin.</Box>
           ) : (
             messages.map((msg, i) => (
-              <ChatBubble key={i} text={msg.text} fromUser={msg.fromUser} />
+              <ChatBubble key={i} text={msg.text} fromUser={msg.fromUser} type={msg.type} />
             ))
           )}
         </Box>
 
-        {showSuggestions && (
+        {/* Show suggestions only when no messages exist */}
+        {messages.length === 0 ? (
           <>
             <ChatSuggestions onSelect={setInput} />
             <Box sx={{ px: 2, py: 1 }}>
               <Box sx={chatStyles.separatorLine} />
             </Box>
-            <QuickAccordionSection onSelect={setInput} />
           </>
+        ) : (
+          // Show separator after chat when messages exist
+          <Box sx={{ px: 2, py: 1 }}>
+            <Box sx={chatStyles.separatorLine} />
+          </Box>
         )}
 
-        <ChatInputBar value={input} onChange={setInput} onSend={handleSend} />
+        {/* <QuickAccordionSection onSelect={setInput} /> */}
+        <QuickAccordionSection
+          onSelect={(value) => {
+            const userMessage = { text: value, fromUser: true };
+            setMessages((prev) => [...prev, userMessage]);
+            setInput('');
+            setShowSuggestions(false);
+
+            // Call your backend API here to get the assistant's response
+            // For now, you can leave the API call as a TODO or placeholder
+          }}
+        />
+
+        <ChatInputBar
+          value={input}
+          onChange={setInput}
+          onSend={handleSend}
+        />
+
         {messages.length > 0 && <ChatClearButton onClear={clearChat} />}
       </Box>
     </>

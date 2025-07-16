@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Box } from '@mui/material';
-import ChatbotPanel from './Chatbot/ChatbotPanel';
+import ChatbotPanel from './chatbot/ChatbotPanel';
 
 const MIN_WIDTH = 350;
 const MAX_WIDTH = 600;

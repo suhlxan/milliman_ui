@@ -6,7 +6,7 @@ import {
   Paper
 } from '@mui/material';
 
-import NavBar from '../components/Navbar/NavBar';
+import NavBar from '../components/navbar/NavBar';
 import EHLogo from '../assets/images/EH_Logo.svg';
 import PersonalDetailsForm from '../components/Forms/PersonalDetailsForm';
 import ResultsTab from '../components/ResultsTab';
