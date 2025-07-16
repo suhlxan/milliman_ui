@@ -6,27 +6,26 @@ import {
   Paper
 } from '@mui/material';
 
-import NavBar from '../components/navbar/NavBar';
+import NavBar from '../components/Navbar/NavBar';
 import EHLogo from '../assets/images/EH_Logo.svg';
-import PersonalDetailsForm from '../components/PersonalDetailsForm';
-import LoadingBar from '../components/LoadingBar';
+import PersonalDetailsForm from '../components/Forms/PersonalDetailsForm';
 import ResultsTab from '../components/ResultsTab';
-import ChatbotPanel from '../components/chatbot/ChatbotPanel';
+import { AdvancedWorkflowContainer, LoadingBar, WorkflowStatusList } from '../components/Workflow';
 
 import { sanitizeName } from '../utils/sanitize';
 import { capitalizeFirstLetter } from '../utils/format';
 import { calculateAge } from '../utils/ageUtils';
 import { useAnalysisRunner } from '../hooks/useAnalysisRunner';
-import AdvancedWorkflowContainer from '../components/AdvancedWorkflowContainer';
+
 
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import PersonIcon from '@mui/icons-material/Person';
 import AssessmentIcon from '@mui/icons-material/Assessment';
-import WorkflowStatusList from '../components/WorkflowStatusList';
 import IconButton from '@mui/material/IconButton';
 import SmartToyIcon from '@mui/icons-material/SmartToy';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import DraggableChatbotPanel from '../components/DraggableChatbotPanel';
+import * as styles from './styles';
 
 export default function MainPage() {
   // Form state
@@ -80,7 +79,7 @@ export default function MainPage() {
     //   className="min-h-screen bg-gray-100">
     <div
       className="min-h-screen bg-gray-100"
-      style={{ marginLeft: submitted && isChatVisible ? `${sidebarWidth}px` : 0 }}
+      style={styles.getContainerMargin(submitted, isChatVisible, sidebarWidth)}
     >
       {/* NAV BAR */}
       <NavBar
@@ -91,7 +90,7 @@ export default function MainPage() {
       />
 
       {/* PAGE CONTENT */}
-      <div className="max-w-7xl mx-auto px-4 py-12">
+      <div className={styles.contentContainerClass}>
         <Box
           display="flex"
           flexDirection={submitted ? { xs: 'column', md: 'row' } : 'column'}
@@ -111,15 +110,7 @@ export default function MainPage() {
           {submitted && !isChatVisible && (
             <IconButton
               onClick={() => setIsChatVisible(true)}
-              sx={{
-                position: 'fixed',
-                bottom: 20,
-                left: 20,
-                backgroundColor: '#1355E9',
-                color: '#fff',
-                zIndex: 1000,
-                '&:hover': { backgroundColor: '#1E58AA' },
-              }}
+              sx={styles.chatbotToggleButton}
             >
               <SmartToyIcon />
             </IconButton>
@@ -129,13 +120,13 @@ export default function MainPage() {
           {/* <Box flex={2}> */}
           <Box flex={submitted && isChatVisible ? 2 : 1}>
             <Box display="flex" alignItems="center" justifyContent="center" mb={2}>
-              <PersonIcon sx={{ color: '#1a237e', marginRight: 1 }} />
-              <Typography component="h2" variant="h4" className="font-bold">
+              <PersonIcon sx={styles.sectionTitleIcon} />
+              <Typography component="h2" variant="h4" className={styles.sectionTitleTextClass}>
                 Patient Information
               </Typography>
             </Box>
 
-            <Typography variant="body1" className="text-gray-600 mb-6">
+            <Typography variant="body1" className={styles.descriptionTextClass}>
               Enter patient information below. This data will be processed through
               the Health Agent workflow with AI analysis and will be available for
               interactive chat queries.
@@ -168,18 +159,9 @@ export default function MainPage() {
                 paddingY={2}
                 paddingX={3}
                 marginTop={4}
-                sx={{
-                  width: 'fit-content',
-                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
-                  transition: 'box-shadow 0.3s ease, transform 0.3s ease',
-                  '&:hover': {
-                    boxShadow: '0 8px 20px rgba(0, 0, 0, 0.15)',
-                    transform: 'translateY(-2px)',
-                  },
-                  cursor: 'default',
-                }}
+                sx={styles.cardAgeBox}
               >
-                <CalendarMonthIcon color="primary" sx={{ marginRight: 1 }} />
+                <CalendarMonthIcon color="primary" sx={styles.calendarIcon} />
                 <Typography variant="body1">
                   <strong>Calculated Age:</strong> {calculateAge(dob.toISOString().split("T")[0])} old
                 </Typography>
@@ -194,7 +176,7 @@ export default function MainPage() {
                   onClick={handleStart}
                   // className="bg-brand-primary-blue hover:bg-brand-mediumBlue active:bg-black rounded-full px-12 py-3"
                   startIcon={<PlayArrowIcon />} 
-                  className="bg-gradient-to-r from-brand-primary-blue to-brand-mediumBlue hover:from-brand-mediumBlue hover:to-brand-primary-blue active:scale-95 transition-transform duration-200 shadow-lg rounded-full px-12 py-3 text-white font-semibold"
+                  className={styles.executeButtonClass}
                 >
                   Execute Health Agent
                 </Button>
@@ -219,26 +201,12 @@ export default function MainPage() {
                       key={index}
                       elevation={3}
                       className="shine-hover"
-                      sx={{
-                        p: 4,
-                        borderRadius: '15px',
-                        textAlign: 'center',
-                        bgcolor: '#ecf8fe',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        transition: 'transform 0.25s ease, box-shadow 0.25s ease',
-                        '&:hover': {
-                          transform: 'scale(1.15)',
-                          boxShadow: 6,
-                        },
-                      }}
+                      sx={styles.statPaper}
                     >
-                      <Typography variant="h4" sx={{ color: '#44B8F3', fontWeight: 'bold' }}>
+                      <Typography variant="h4" sx={styles.statValue}>
                         {item.value}
                       </Typography>
-                      <Typography variant="body2" sx={{ color: '#1E58AA', fontWeight: 'semi-bold' }}>
+                      <Typography variant="body2" sx={styles.statLabel}>
                         {item.label}
                       </Typography>
                     </Paper>
@@ -256,8 +224,8 @@ export default function MainPage() {
             {submitted && (
               <div className="mt-12">
                 <Box display="flex" alignItems="center" justifyContent="center" mb={2}>
-                  <AssessmentIcon fontSize="large" sx={{ color: '#20c997', marginRight: 1 }} />
-                  <Typography variant="h4" className="font-semibold text-brand-black">
+                  <AssessmentIcon fontSize="large" sx={styles.resultsSectionIcon} />
+                  <Typography variant="h4" className={styles.resultsTitleClass}>
                     Health Agent   Analysis Results
                   </Typography>
                 </Box>

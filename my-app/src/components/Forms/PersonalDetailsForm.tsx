@@ -1,3 +1,4 @@
+
 import React from "react";
 import {
   TextField,
@@ -10,6 +11,7 @@ import { subYears } from "date-fns";
 
 import SSNField from "./SSNField";
 import FormError from "./FormError";
+import { inputFieldClass, formContainerClass, formGridClass } from './styles';
 
 interface Props {
   firstName: string;
@@ -32,10 +34,6 @@ interface Props {
 }
 
 const GENDERS = ["Female", "Male", "Other"];
-const inputClasses =
-  "h-14 w-full rounded-md outline-none " +
-  "focus:border-brand-mediumBlue focus:ring-2 focus:ring-brand-mediumBlue " +
-  "transition-all duration-150";
 
 const PersonalDetailsForm: React.FC<Props> = ({
   firstName,
@@ -58,11 +56,11 @@ const PersonalDetailsForm: React.FC<Props> = ({
   const earliest = subYears(today, 150);
 
   return (
-    <Box className="bg-white rounded-2xl shadow-lg p-8 mt-8 mb-6">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-6">
+    <Box className={formContainerClass}>
+      <div className={formGridClass}>
         <div>
           <TextField
-            className={inputClasses}
+            className={inputFieldClass}
             label="First Name"
             value={firstName}
             onChange={(e) => setFirstName(e.target.value)}
@@ -74,7 +72,7 @@ const PersonalDetailsForm: React.FC<Props> = ({
 
         <div>
           <TextField
-            className={inputClasses}
+            className={inputFieldClass}
             label="Last Name"
             value={lastName}
             onChange={(e) => setLastName(e.target.value)}
@@ -86,7 +84,7 @@ const PersonalDetailsForm: React.FC<Props> = ({
 
         <div>
           <TextField
-            className={inputClasses}
+            className={inputFieldClass}
             select
             label="Gender"
             value={gender}
@@ -105,7 +103,7 @@ const PersonalDetailsForm: React.FC<Props> = ({
 
         <div>
           <SSNField
-            className={inputClasses}
+            className={inputFieldClass}
             value={ssn}
             show={showSSN}
             onChange={setSSN}
@@ -127,7 +125,7 @@ const PersonalDetailsForm: React.FC<Props> = ({
               maxDate={today}
               slotProps={{
                 textField: {
-                  className: inputClasses,
+                  className: inputFieldClass,
                   variant: "outlined",
                   error: !!errors.dob,
                 },
@@ -139,7 +137,7 @@ const PersonalDetailsForm: React.FC<Props> = ({
 
         <div>
           <TextField
-            className={inputClasses}
+            className={inputFieldClass}
             label="Zip Code"
             placeholder="12345"
             value={zipCode}

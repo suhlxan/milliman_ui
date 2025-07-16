@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Box } from '@mui/material';
-import ChatbotPanel from './chatbot/ChatbotPanel';
+import ChatbotPanel from './Chatbot/ChatbotPanel';
 
-const MIN_WIDTH = 400;
+const MIN_WIDTH = 350;
 const MAX_WIDTH = 600;
 
 const DraggableChatbotPanel = ({
@@ -14,7 +14,7 @@ const DraggableChatbotPanel = ({
     onClose: () => void;
     onWidthChange?: (width: number) => void;
 }) => {
-    const [width, setWidth] = useState(400);
+    const [width, setWidth] = useState(350);
     const [resizing, setResizing] = useState(false);
 
     const startResize = (e: React.MouseEvent) => {

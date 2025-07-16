@@ -315,7 +315,7 @@ export default function ResultsTab() {
           </IconButton>
           <SummarizeIcon sx={{ fontSize: 24, color: '#009688', marginRight: 1 }} />
           <Typography variant="h6" className="font-semibold text-brand-mediumBlue  hover:text-brand-primary-blue transition-colors duration-200">
-            Final Summary
+            Patient Health Summary
           </Typography>
 
         </Box>

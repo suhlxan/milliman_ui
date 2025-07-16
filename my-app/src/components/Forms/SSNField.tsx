@@ -5,8 +5,9 @@ import {
   InputAdornment,
   IconButton,
 } from "@mui/material";
-import VisibilityOn from "../assets/images/visibility_on.svg";
-import VisibilityOff from "../assets/images/visibility_off.svg";
+import { ssnIconClass } from './styles';
+import VisibilityOn from "../../assets/images/visibility_on.svg";
+import VisibilityOff from "../../assets/images/visibility_off.svg";
 
 // Props definition for the SSNField component
 export interface SSNFieldProps {
@@ -75,7 +76,7 @@ const SSNField: React.FC<SSNFieldProps> = ({
               <img
                 src={show ? VisibilityOff : VisibilityOn}
                 alt={show ? "Hide SSN" : "Show SSN"}
-                className="w-5 h-5"
+                className={ssnIconClass}
               />
             </IconButton>
           </InputAdornment>

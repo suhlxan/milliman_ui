@@ -1,7 +1,8 @@
 // src/components/FormError.tsx
 
 import React from "react";
-import ErrorIcon from "../assets/images/error.svg";
+import ErrorIcon from "../../assets/images/error.svg";
+import { formErrorClass, formErrorIconClass } from './styles';
 
 interface FormErrorProps {
   message: string;
@@ -18,8 +19,8 @@ interface FormErrorProps {
 
 const FormError: React.FC<FormErrorProps> = ({ message }) => {
   return (
-    <div className="flex items-start gap-2 text-brand-error text-sm mt-1">
-      <img src={ErrorIcon} alt="Error" className="w-4 h-4 mt-0.5" />
+    <div className={formErrorClass}>
+      <img src={ErrorIcon} alt="Error" className={formErrorIconClass} />
       <span>{message}</span>
     </div>
   );
