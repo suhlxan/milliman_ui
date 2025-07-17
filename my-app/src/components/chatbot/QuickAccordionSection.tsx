@@ -12,9 +12,11 @@ import DescriptionIcon from '@mui/icons-material/Description';
 
 interface QuickAccordionSectionProps {
     onSelect: (value: string) => void;
+    expandedIndex: number | null;
+    setExpandedIndex: (index: number | null) => void;
 }
 
-const QuickAccordionSection: React.FC<QuickAccordionSectionProps> = ({ onSelect }) => {
+const QuickAccordionSection: React.FC<QuickAccordionSectionProps> = ({ onSelect, expandedIndex, setExpandedIndex }) => {
     const groups = [
         {
             category: '📄 Medical Records',
@@ -62,6 +64,10 @@ const QuickAccordionSection: React.FC<QuickAccordionSectionProps> = ({ onSelect 
             {groups.map((group, index) => (
                 <Accordion
                     key={index}
+                    //new
+                    expanded={expandedIndex === index}
+                    onChange={() => setExpandedIndex(expandedIndex === index ? null : index)}
+
                     disableGutters
                     sx={{
                         backgroundColor: '#F4F6F8',

@@ -27,6 +27,8 @@ const ChatbotPanel: React.FC<ChatbotPanelProps> = ({ visible, onClose, width }) 
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState<{ text: string; fromUser: boolean; type?: string }[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(true);
+  const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
+
 
   useEffect(() => {
     if (visible) {
@@ -108,10 +110,12 @@ const ChatbotPanel: React.FC<ChatbotPanelProps> = ({ visible, onClose, width }) 
             setMessages((prev) => [...prev, userMessage]);
             setInput('');
             setShowSuggestions(false);
+            setExpandedIndex(null); // Collapse the accordion
 
-            // Call your backend API here to get the assistant's response
-            // For now, you can leave the API call as a TODO or placeholder
+            // TODO: Call your backend API here to get the assistant's response
           }}
+          expandedIndex={expandedIndex}
+          setExpandedIndex={setExpandedIndex}
         />
 
         <ChatInputBar
