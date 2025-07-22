@@ -1,4 +1,4 @@
-// src/components/WorkflowStatusList.tsx
+// src/components/Workflow/WorkflowStatusList.tsx
 import React from 'react';
 import { Box, Typography, CircularProgress, Chip } from '@mui/material';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
@@ -13,6 +13,11 @@ interface Task {
   status: TaskStatus;
 }
 
+interface WorkflowStatusListProps {
+  stepStatus: Record<string, string>; // e.g. { fetch_api_data: "completed" }
+  stepsCompleted?: number;
+}
+
 const statusColors: Record<TaskStatus, string> = {
   COMPLETE: '#4caf50',
   PROCESSING: '#ff9800',
@@ -24,6 +29,7 @@ const statusBackgrounds: Record<TaskStatus, string> = {
   PROCESSING: '#fffde7',
   WAITING: '#f5f5f5',
 };
+
 
 const getStatusIcon = (status: TaskStatus) => {
   const color = statusColors[status];
@@ -39,50 +45,107 @@ const getStatusIcon = (status: TaskStatus) => {
   }
 };
 
-const tasks: Task[] = [
-  {
+// const stepDescriptions: Record<string, { title: string; description: string }> = {
+  
+export const stepDescriptions: Record<string, { title: string; description: string }> = {
+  fetch_api_data: {
     title: 'Fetching Claims Data',
     description: 'Retrieving medical and pharmacy claims from secure APIs',
-    status: 'COMPLETE',
   },
-  {
+  deidentify_claims_data: {
     title: 'Deidentifying Claims Data',
     description: 'Removing personal identifiers while preserving clinical value',
-    status: 'PROCESSING',
   },
-  {
+  extract_claims_fields: {
     title: 'Extracting Claims Fields',
     description: 'Parsing medical codes, NDC numbers, and structured data',
-    status: 'WAITING',
   },
-  {
+  extract_entities: {
     title: 'Extracting Health Entities',
     description: 'Identifying conditions, medications, and risk factors',
-    status: 'WAITING',
   },
-  {
+  analyze_trajectory: {
     title: 'Analyzing Health Trajectory',
     description: 'Computing longitudinal health patterns and trends',
-    status: 'WAITING',
   },
-  {
+  generate_summary: {
     title: 'Generating Summary',
     description: 'Creating comprehensive clinical assessment report',
-    status: 'WAITING',
   },
-  {
+  predict_heart_attack: {
     title: 'Predicting Heart Attack Risk',
     description: 'Running advanced ML risk assessment algorithms',
-    status: 'WAITING',
   },
-];
+  initialize_chatbot: {
+    title: 'Initializing Chatbot',
+    description: 'Setting up patient-aware conversation tools',
+  },
+};
 
-const WorkflowStatusList: React.FC = () => {
+const mapStatus = (backendStatus: string): TaskStatus => {
+  switch (backendStatus?.toLowerCase()) {
+    case 'completed':
+      return 'COMPLETE';
+    case 'processing':
+      return 'PROCESSING';
+    default:
+      return 'WAITING';
+  }
+};
+
+const WorkflowStatusList: React.FC<WorkflowStatusListProps> = ({ stepStatus, stepsCompleted }) => {
+  // const tasks: Task[] = Object.entries(stepStatus).map(([key, status]) => {
+  //   const { title, description } = stepDescriptions[key] || {
+  //     title: key,
+  //     description: 'No description available',
+  //   };
+
+  //   return {
+  //     title,
+  //     description,
+  //     status: mapStatus(status),
+  //   };
+  // });
+  const allStepKeys = Object.keys(stepDescriptions);
+
+  const tasks: Task[] = allStepKeys.map((key) => {
+    const backendStatus = stepStatus[key] as string | undefined || 'waiting'; // default to 'waiting'
+    const { title, description } = stepDescriptions[key];
+
+    return {
+      title,
+      description,
+      status: mapStatus(backendStatus),
+    };
+  });
+
+
+  const totalSteps = tasks.length;
+
+  const completedCount = tasks.filter(task => task.status === 'COMPLETE').length;
+  const processingCount = tasks.filter(task => task.status === 'PROCESSING').length;
+
+
   return (
     <Box mt={6} p={3} bgcolor="white" borderRadius={3} boxShadow={3}>
       <Typography variant="h6" fontWeight="bold" mb={2} color="primary">
         Workflow Execution Pipeline
       </Typography>
+
+      {/* <Typography variant="body2" color="textSecondary" mb={2}>
+        {tasks.filter(task => task.status === 'COMPLETE').length} of {totalSteps} steps completed
+      </Typography> */}
+      <Typography variant="body2" color="textSecondary" mb={1}>
+        {totalSteps} TOTAL STEPS
+      </Typography>
+      <Typography variant="body2" color="textSecondary" mb={1}>
+        {completedCount} COMPLETED
+      </Typography>
+      <Typography variant="body2" color="textSecondary" mb={2}>
+        {processingCount} PROCESSING
+      </Typography>
+
+
       {tasks.map((task, index) => (
         <Box
           key={index}
@@ -129,4 +192,3 @@ const WorkflowStatusList: React.FC = () => {
 };
 
 export default WorkflowStatusList;
- 

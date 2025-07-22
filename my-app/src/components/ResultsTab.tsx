@@ -1,4 +1,4 @@
-//components/rrResults.tsx
+//components/Results.tsx
 import React, { useState } from 'react';
 import { Box, Tabs, Tab, Collapse, IconButton, Typography, Paper, } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -14,30 +14,44 @@ import SmokingRoomsIcon from '@mui/icons-material/SmokingRooms'; // For Smoking
 import LiquorIcon from '@mui/icons-material/Liquor'; // For Alcohol
 import MonitorHeartIcon from '@mui/icons-material/MonitorHeart'; // For Blood Pressure
 
-const TABS = ['MCID Claims', 'Medical Claims', 'Pharmacy Claims'];
+interface Props {
+  analysisResults: {
+    deidentified_data: {
+      mcid: { mcid_claims_data: any };
+      medical: { medical_claims_data: any };
+      pharmacy: { pharmacy_claims_data: any };
+    };
+    structured_extractions?: {
+      medical?: {
+        extraction_summary?: {
+          total_hlth_srvc_records?: number;
+          total_diagnosis_codes?: number;
+          unique_service_codes?: string[];
+        };
+      };
+      pharmacy?: {
+        extraction_summary?: {
+          total_ndc_records?: number;
+          unique_ndc_codes?: string[];
+          unique_label_names?: string[];
+        };
+      };
+    };
+    medical_extraction?: any;
+    pharmacy_extraction?: any;
+    entity_extraction?: any;
+    health_trajectory?: string;
+    final_summary?: string;
+    heart_attack_prediction?: {
+      combined_display: string;
+    };
+  };
+}
 
 
-const apiData = [
-  `{
-    "src_mbr_first_nm":"[MASKED_NAME]"
-    "src_mbr_last_nm":"[MASKED_NAME]"
-    "src_mbr_mid_init_nm":NULL
-    "src_mbr_age":0
-    "src_mbr_zip_cd":"12345"
-    "medical_claims_data":{
-    "REQUESTID":"77554079"
-    "MESSAGE":"User not found"
-    "MEDICAL_CLAIMS":[]
-    }
-    "original_structure_preserved":true
-    "deidentification_timestamp":"2025-07-04T07:04:14.479810"
-    "data_type":"medical_claims"
-    }`,
-  `Medical result line 1\nMedical result line 2`,
-  `Pharmacy result line 1\nPharmacy result line 2`,
-];
+// const TABS = ['MCID Claims', 'Medical Claims', 'Pharmacy Claims'];
 
-export default function ResultsTab() {
+export default function ResultsTab({ analysisResults }: Props) {
   const [claimsOpen, setClaimsOpen] = useState(false);
   const [selectedTab, setSelectedTab] = useState(0);
   const [panelOpen, setPanelOpen] = useState(false);
@@ -48,6 +62,26 @@ export default function ResultsTab() {
   const [finalSummaryOpen, setFinalSummaryOpen] = useState(false);
   const [heartRiskOpen, setHeartRiskOpen] = useState(false);
 
+  const TABS = ['MCID Claims', 'Medical Claims', 'Pharmacy Claims'];
+  const tabKeys = ['mcid', 'medical', 'pharmacy'];
+
+  const apiData: { [key: string]: any } = {
+    mcid: analysisResults.deidentified_data?.mcid?.mcid_claims_data || {},
+    medical: analysisResults.deidentified_data?.medical?.medical_claims_data || {},
+    pharmacy: analysisResults.deidentified_data?.pharmacy?.pharmacy_claims_data || {}
+  };
+
+
+  const extractionSummary = {
+    medical: analysisResults.structured_extractions?.medical?.extraction_summary || {},
+    pharmacy: analysisResults.structured_extractions?.pharmacy?.extraction_summary || {}
+  };
+
+  const entities = analysisResults.entity_extraction || {};
+  const heartRisk = analysisResults.heart_attack_prediction?.combined_display || '';
+  const finalSummary = analysisResults.final_summary || '';
+  const trajectory = analysisResults.health_trajectory || '';
+
   const toggleClaimsOpen = () => setClaimsOpen((prev) => !prev);
   const togglePanelOpen = () => setPanelOpen((prev) => !prev);
 
@@ -56,7 +90,7 @@ export default function ResultsTab() {
     setPanelOpen(true); // auto-open panel when switching tabs
   };
 
-  const snippet = apiData[selectedTab].split('\n')[0];
+  //const snippet = apiData[selectedTab].split('\n')[0];
 
   return (
     <Box className="max-w-6xl mx-auto mt-4">
@@ -65,7 +99,7 @@ export default function ResultsTab() {
         <IconButton size="small" className="text-brand-cyan mr-2">
           {claimsOpen ? <ExpandMoreIcon /> : <ChevronRightIcon />}
         </IconButton>
-        <DescriptionIcon sx={{ fontSize: 24, color: 'f7c59f' , marginRight: 1 }} />
+        <DescriptionIcon sx={{ fontSize: 24, color: 'f7c59f', marginRight: 1 }} />
         <Typography variant="h6" className="font-semibold text-brand-mediumBlue hover:text-brand-primary-blue transition-colors duration-200">
           Claims Data
         </Typography>
@@ -75,10 +109,6 @@ export default function ResultsTab() {
       {/* Collapsible Claims Section */}
       <Collapse in={claimsOpen} unmountOnExit>
         <Box mt={3}>
-          {/* <Typography variant="h6" className="mb-2 text-brand-navy pb-2">
-            Deidentified Claims Data
-          </Typography> */}
-
           <Paper elevation={2} className="p-4 rounded-xl">
             <Tabs
               value={selectedTab}
@@ -92,13 +122,18 @@ export default function ResultsTab() {
                   key={label}
                   label={label}
                   value={index}
-                  sx={{ '&:hover': { backgroundColor: 'white', color: '#1355E9', transition: 'all 0.3s ease', }, }}
+                  sx={{
+                    '&:hover': {
+                      backgroundColor: 'white',
+                      color: '#1355E9',
+                      transition: 'all 0.3s ease',
+                    },
+                  }}
                 />
               ))}
-
             </Tabs>
 
-            {/* Collapsible Panel for Tab Content */}
+            {/* Panel for Tab Content */}
             <Box className="mt-4 bg-white rounded-2xl shadow-lg overflow-hidden">
               <Box className="p-4 flex items-center">
                 <IconButton
@@ -113,26 +148,30 @@ export default function ResultsTab() {
                   )}
                 </IconButton>
                 <Typography variant="body1" className="text-gray-700">
-                  {snippet}
+                  {
+                    apiData[tabKeys[selectedTab]]?.MESSAGE ||
+                    'No message available for this claim type.'
+                  }
                 </Typography>
               </Box>
 
               <Collapse in={panelOpen} unmountOnExit>
                 <Box className="p-8 pt-0">
-                  {apiData[selectedTab]
-                    .split('\n')
-                    .map((line, i) => (
-                      <Typography key={i} variant="body2" className="mb-2">
-                        {line}
-                      </Typography>
-                    ))}
+                  {Object.entries(apiData[tabKeys[selectedTab]]).map(([key, value]) => (
+                    <Typography key={key} variant="body2" className="mb-2">
+                      <strong>{key}:</strong>{' '}
+                      {typeof value === 'object'
+                        ? JSON.stringify(value, null, 2)
+                        : String(value)}
+                    </Typography>
+                  ))}
                 </Box>
               </Collapse>
             </Box>
           </Paper>
         </Box>
       </Collapse>
-      
+
       {/* Claims Data Extraction Header */}
       <Box mt={6}>
         <Box className="bg-white p-2 rounded-2xl shadow-lg" display="flex" alignItems="center" onClick={() => setClaimsExtractionOpen(prev => !prev)} sx={{ cursor: 'pointer' }} >
@@ -172,15 +211,15 @@ export default function ResultsTab() {
                 <Box display="flex" gap={4} flexWrap="wrap" mt={2}>
                   {/* <Paper elevation={2} className="p-4 rounded-lg min-w-[300px] text-center"> */}
                   <Paper elevation={2} className="text-center" sx={{ p: 4, borderRadius: 2, minWidth: 350, minHeight: 160, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                    <Typography variant="h4" className="font-bold text-brand-navy">0</Typography>
+                    <Typography variant="h4" className="font-bold text-brand-navy">{extractionSummary.medical.total_hlth_srvc_records ?? 0}</Typography>
                     <Typography variant="body2" className="text-gray-600">Health Service Records</Typography>
                   </Paper>
                   <Paper elevation={2} className="text-center" sx={{ p: 4, borderRadius: 2, minWidth: 350, minHeight: 160, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                    <Typography variant="h4" className="font-bold text-brand-navy">0</Typography>
+                    <Typography variant="h4" className="font-bold text-brand-navy">{extractionSummary.medical.total_diagnosis_codes ?? 0}</Typography>
                     <Typography variant="body2" className="text-gray-600">Diagnosis Codes</Typography>
                   </Paper>
                   <Paper elevation={2} className="text-center" sx={{ p: 4, borderRadius: 2, minWidth: 350, minHeight: 160, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                    <Typography variant="h4" className="font-bold text-brand-navy">0</Typography>
+                    <Typography variant="h4" className="font-bold text-brand-navy">{extractionSummary.medical.unique_service_codes?.length ?? 0}</Typography>
                     <Typography variant="body2" className="text-gray-600">Unique Service Codes</Typography>
                   </Paper>
                 </Box>
@@ -193,16 +232,16 @@ export default function ResultsTab() {
                   Pharmacy Claims Extraction Summary
                 </Typography>
                 <Box display="flex" gap={4} flexWrap="wrap" mt={2}>
-                <Paper elevation={2} className="text-center" sx={{ p: 4, borderRadius: 2, minWidth: 350, minHeight: 160, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                    <Typography variant="h4" className="font-bold text-brand-navy">0</Typography>
+                  <Paper elevation={2} className="text-center" sx={{ p: 4, borderRadius: 2, minWidth: 350, minHeight: 160, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                    <Typography variant="h4" className="font-bold text-brand-navy">{extractionSummary.pharmacy.total_ndc_records ?? 0}</Typography>
                     <Typography variant="body2" className="text-gray-600">NDC Records</Typography>
                   </Paper>
                   <Paper elevation={2} className="text-center" sx={{ p: 4, borderRadius: 2, minWidth: 350, minHeight: 160, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                    <Typography variant="h4" className="font-bold text-brand-navy">0</Typography>
+                    <Typography variant="h4" className="font-bold text-brand-navy">{extractionSummary.pharmacy.unique_ndc_codes?.length ?? 0}</Typography>
                     <Typography variant="body2" className="text-gray-600">Unique NDC Codes</Typography>
                   </Paper>
                   <Paper elevation={2} className="text-center" sx={{ p: 4, borderRadius: 2, minWidth: 350, minHeight: 160, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                    <Typography variant="h4" className="font-bold text-brand-navy">0</Typography>
+                    <Typography variant="h4" className="font-bold text-brand-navy">{extractionSummary.pharmacy.unique_label_names?.length ?? 0}</Typography>
                     <Typography variant="body2" className="text-gray-600">Unique Medications</Typography>
                   </Paper>
                 </Box>
@@ -222,7 +261,7 @@ export default function ResultsTab() {
           <IconButton size="small" className="text-brand-cyan mr-2">
             {entityExtractionOpen ? <ExpandMoreIcon /> : <ChevronRightIcon />}
           </IconButton>
-         
+
           <PrecisionManufacturingIcon sx={{ fontSize: 24, color: '#1E58AA', marginRight: 1 }} />
           <Typography variant="h6" className="font-semibold text-brand-mediumBlue  hover:text-brand-primary-blue transition-colors duration-200">
             Enhanced Entity Extraction
@@ -233,11 +272,11 @@ export default function ResultsTab() {
         <Collapse in={entityExtractionOpen} unmountOnExit>
           <Box mt={3} display="flex" gap={4} flexWrap="wrap">
             {[
-              { label: 'Diabetes', value: 'NO', icon: <HealingIcon sx={{ color: '#d81b60', mr: 1 }} /> },
-              { label: 'Age Group', value: 'UNKNOWN', icon: <ElderlyIcon sx={{ color: '#6d4c41', mr: 1 }} /> },
-              { label: 'Smoking', value: 'NO', icon: <SmokingRoomsIcon sx={{ color: '#607d8b', mr: 1 }} /> },
-              { label: 'Alcohol', value: 'NO', icon: <LiquorIcon sx={{ color: '#673ab7', mr: 1 }} /> },
-              { label: 'Blood Pressure', value: 'UNKNOWN', icon: <MonitorHeartIcon sx={{ color: '#e53935', mr: 1 }} /> },
+              { label: 'Diabetes', value: entities.diabetics || 'unknown', icon: <HealingIcon sx={{ color: '#d81b60', mr: 1 }} /> },
+              { label: 'Age Group', value: entities.age_group || 'unknown', icon: <ElderlyIcon sx={{ color: '#6d4c41', mr: 1 }} /> },
+              { label: 'Smoking', value: entities.smoking || 'unknown', icon: <SmokingRoomsIcon sx={{ color: '#607d8b', mr: 1 }} /> },
+              { label: 'Alcohol', value: entities.alcohol || 'unknown', icon: <LiquorIcon sx={{ color: '#673ab7', mr: 1 }} /> },
+              { label: 'Blood Pressure', value: entities.blood_pressure || 'unknown', icon: <MonitorHeartIcon sx={{ color: '#e53935', mr: 1 }} /> },
             ].map((item, index) => (
               <Paper
                 key={index}
@@ -280,7 +319,7 @@ export default function ResultsTab() {
           <IconButton size="small" className="text-brand-cyan mr-2">
             {healthTrajectoryOpen ? <ExpandMoreIcon /> : <ChevronRightIcon />}
           </IconButton>
-          <TrendingUpIcon sx={{ fontSize: 24, color: '#9C27B0' , marginRight: 1 }} />
+          <TrendingUpIcon sx={{ fontSize: 24, color: '#9C27B0', marginRight: 1 }} />
           <Typography variant="h6" className="font-semibold text-brand-mediumBlue  hover:text-brand-primary-blue transition-colors duration-200">
             Health Trajectory
           </Typography>
@@ -289,15 +328,14 @@ export default function ResultsTab() {
 
         <Collapse in={healthTrajectoryOpen} unmountOnExit>
           <Box mt={3} className="bg-white p-6 rounded-xl shadow-md">
-            <Typography variant="body2" className="mb-2">
-              Based on the provided de-identified claims data, a comprehensive analysis of the patient's health trajectory is conducted across seven key areas.
+            <Typography
+              variant="body2"
+              className="text-gray-800"
+              sx={{ whiteSpace: 'pre-line' }}
+            >
+              {trajectory}
             </Typography>
-            <Typography variant="body2" className="mb-2">
-              <strong>Current Health Status:</strong> No medical or pharmacy claims found. The patient is not diabetic, does not smoke, and does not consume alcohol. Age group and blood pressure status are unknown.
-            </Typography>
-            <Typography variant="body2">
-              <strong>Risk Factors:</strong> No ICD-10 codes or medication patterns available. Some lifestyle indicators suggest absence of smoking and alcohol use.
-            </Typography>
+
           </Box>
         </Collapse>
       </Box>
@@ -322,17 +360,16 @@ export default function ResultsTab() {
 
         <Collapse in={finalSummaryOpen} unmountOnExit>
           <Box mt={3} className="bg-white p-6 rounded-xl shadow-md">
-            <Typography variant="body2" className="mb-2">
-              The patient's current health status is unclear due to missing claims data.
-            </Typography>
-            <Typography variant="body2" className="mb-2">
-              No major risk factors identified, but age and blood pressure are unknown.
-            </Typography>
-            <Typography variant="body2">
-              A full health assessment and updated demographic data are recommended.
+            <Typography
+              variant="body2"
+              className="text-gray-800"
+              sx={{ whiteSpace: 'pre-line' }}
+            >
+              {finalSummary}
             </Typography>
           </Box>
         </Collapse>
+
       </Box>
       {/* Heart Attack Risk Prediction Section */}
       <Box mt={6}>
@@ -347,7 +384,7 @@ export default function ResultsTab() {
             {heartRiskOpen ? <ExpandMoreIcon /> : <ChevronRightIcon />}
           </IconButton>
           <Typography variant="h6" className="font-semibold text-brand-mediumBlue  hover:text-brand-primary-blue transition-colors duration-200">
-           ❤️ Heart Attack Risk Prediction
+            ❤️ Heart Attack Risk Prediction
           </Typography>
         </Box>
 
@@ -375,7 +412,7 @@ export default function ResultsTab() {
               }}
             >
               <Typography variant="body1" className="font-semibold text-brand-navy">
-                Heart Disease Risk: 39.0% (Low Risk) | Confidence: 39.0%
+               {heartRisk || 'Risk data not available'}
               </Typography>
             </Box>
           </Box>

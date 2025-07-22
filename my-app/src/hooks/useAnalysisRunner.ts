@@ -45,10 +45,17 @@ export function useAnalysisRunner({
     if (!zipCode || zipCode.length < 5) {
       newErrors.zipCode = "Enter a valid 5-digit ZIP code.";
     }
+    // if (!zipCode || zipCode.length < 5 || zipCode.length > 10) {
+    //   newErrors.zipCode = "ZIP code must be between 5 and 10 characters.";
+    // }
 
     if (!ssn || ssn.replace(/\D/g, '').length < 9) {
       newErrors.ssn = "Enter a 9-digit SSN.";
     }
+    // const cleanSSN = ssn.replace(/\D/g, '');
+    // if (!cleanSSN || cleanSSN.length < 9 || cleanSSN.length > 11) {
+    //   newErrors.ssn = "SSN must be between 9 and 11 digits.";
+    // }
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
@@ -89,4 +96,3 @@ export function useAnalysisRunner({
     setSubmitted,
   };
 }
- 

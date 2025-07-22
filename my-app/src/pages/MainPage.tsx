@@ -26,6 +26,9 @@ import SmartToyIcon from '@mui/icons-material/SmartToy';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import DraggableChatbotPanel from '../components/DraggableChatbotPanel';
 import * as styles from './styles';
+import axios from 'axios';
+import AgentService from '../api/AgentService';
+import { stepDescriptions } from '../components/Workflow/WorkflowStatusList';
 
 export default function MainPage() {
   // Form state
@@ -39,6 +42,9 @@ export default function MainPage() {
   const [chatOpen, setChatOpen] = useState(false);
   const [isChatVisible, setIsChatVisible] = useState(true);
   const [sidebarWidth, setSidebarWidth] = useState(300);
+  const [isExecuting, setIsExecuting] = useState(false);
+  const [analysisResults, setAnalysisResults] = useState<any>(null);
+  const [stepStatus, setStepStatus] = useState<Record<string, string>>({});
 
   // UI control state
   const [showStopButton, setShowStopButton] = useState(false);
@@ -64,9 +70,123 @@ export default function MainPage() {
     }
   }, [isLoading, submitted]);
 
-  const handleStart = () => {
+
+  // const handleStart = async () => {
+  //   if (isExecuting) return;
+  //   setIsExecuting(true);
+  //   setShowStopButton(true);
+
+  //   try {
+  //     const health = await AgentService.checkHealthAgent();
+
+  //     if (health.status === 'healthy' && health.agent_available) {
+  //       const payload = {
+  //         first_name: firstName,
+  //         last_name: lastName,
+  //         ssn,
+  //         date_of_birth: dob?.toISOString().split('T')[0] ?? '',
+  //         gender: gender.charAt(0),
+  //         zip_code: zipCode
+  //       };
+
+  //       //  Step 1: Kick off Async Analysis FIRST
+  //       const asyncResult = await AgentService.startAnalysis(payload);
+
+  //       if (asyncResult.success) {
+  //         console.log('Async Session ID:', asyncResult.session_id);
+  //         console.log('Async Message:', asyncResult.message);
+
+  //         //  Step 2: Run Sync Analysis AFTER async kicks off
+  //         const syncResult = await AgentService.runAnalysisSync(payload);
+
+  //         if (syncResult.success) {
+  //           console.log('Sync Analysis Result:', syncResult);
+
+  //           setAnalysisResults(syncResult.analysis_results);
+  //           //  Step 3: Proceed with analysis simulation (UI flow)
+  //           handleExecute();
+  //           simulateStepProgress();
+  //         } else {
+  //           console.warn('Validation Errors (sync):', syncResult.errors);
+  //           alert('Synchronous analysis failed. Please check form input.');
+  //           setShowStopButton(false);
+  //         }
+  //       } else {
+  //         alert('Async analysis failed to start.');
+  //         setShowStopButton(false);
+  //       }
+
+  //     } else {
+  //       alert('Health Agent is currently unavailable.');
+  //       setShowStopButton(false);
+  //     }
+  //   } catch (error) {
+  //     console.error('Execute Health Agent failed:', error);
+  //     alert('Unexpected error during execution.');
+  //     setShowStopButton(false);
+  //   } finally {
+  //     setIsExecuting(false);
+  //   }
+  // };
+  const handleStart = async () => {
+    if (isExecuting) return;
+    setIsExecuting(true);
     setShowStopButton(true);
-    handleExecute();
+  
+    try {
+      const payload = {
+        first_name: firstName,
+        last_name: lastName,
+        ssn,
+        date_of_birth: dob?.toISOString().split('T')[0] ?? '',
+        gender: gender.charAt(0),
+        zip_code: zipCode
+      };
+  
+      // Only run Sync Analysis
+      const syncResult = await AgentService.runAnalysisSync(payload);
+  
+      if (syncResult.success) {
+        console.log('Sync Analysis Result:', syncResult);
+  
+        setAnalysisResults(syncResult.analysis_results);
+        handleExecute();
+        simulateStepProgress();
+      } else {
+        console.warn('Validation Errors (sync):', syncResult.errors);
+        alert('Synchronous analysis failed. Please check form input.');
+        setShowStopButton(false);
+      }
+    } catch (error) {
+      console.error('Execute Health Agent failed:', error);
+      alert('Unexpected error during execution.');
+      setShowStopButton(false);
+    } finally {
+      setIsExecuting(false);
+    }
+  };
+  
+
+  const stepKeys = Object.keys(stepDescriptions);
+
+  const simulateStepProgress = async () => {
+    for (let i = 0; i < stepKeys.length; i++) {
+      const currentStep = stepKeys[i];
+
+      // Set current step to processing
+      setStepStatus((prev) => ({
+        ...prev,
+        [currentStep]: 'processing',
+      }));
+
+      await new Promise((resolve) => setTimeout(resolve, 1500)); // Simulate delay
+
+      // Mark current step as completed
+      setStepStatus((prev) => ({
+        ...prev,
+        [currentStep]: 'completed',
+      }));
+    }
   };
 
   const handleStop = () => {
@@ -175,7 +295,7 @@ export default function MainPage() {
                   size="large"
                   onClick={handleStart}
                   // className="bg-brand-primary-blue hover:bg-brand-mediumBlue active:bg-black rounded-full px-12 py-3"
-                  startIcon={<PlayArrowIcon />} 
+                  startIcon={<PlayArrowIcon />}
                   className={styles.executeButtonClass}
                 >
                   Execute Health Agent
@@ -185,7 +305,7 @@ export default function MainPage() {
               <>
                 <AdvancedWorkflowContainer />
 
-                <Box
+                {/* <Box
                   mt={6}
                   display="grid"
                   gridTemplateColumns="repeat(auto-fit, minmax(220px, 1fr))"
@@ -211,17 +331,72 @@ export default function MainPage() {
                       </Typography>
                     </Paper>
                   ))}
+                </Box> */}
+                <Box
+                  mt={6}
+                  display="grid"
+                  gridTemplateColumns="repeat(auto-fit, minmax(220px, 1fr))"
+                  gap={3}
+                >
+                  {(() => {
+                    const stepStatus = analysisResults?.step_status || {};
+                    const totalSteps = Object.keys(stepStatus).length;
+                    const completedSteps = Object.values(stepStatus).filter(
+                      (status) => (status as string).toLowerCase() === 'completed'
+                    ).length;
+                    const processingSteps = Object.values(stepStatus).filter(
+                      (status) => (status as string).toLowerCase() === 'processing'
+                    ).length;
+
+                    return [
+                      { label: 'TOTAL STEPS', value: totalSteps },
+                      { label: 'COMPLETED', value: completedSteps },
+                      { label: 'PROCESSING', value: processingSteps },
+                      { label: 'PROGRESS', value: `${progress}%` },
+                    ].map((item, index) => (
+                      <Paper
+                        key={index}
+                        elevation={3}
+                        className="shine-hover"
+                        sx={styles.statPaper}
+                      >
+                        <Typography variant="h4" sx={styles.statValue}>
+                          {item.value}
+                        </Typography>
+                        <Typography variant="body2" sx={styles.statLabel}>
+                          {item.label}
+                        </Typography>
+                      </Paper>
+                    ));
+                  })()}
                 </Box>
 
-                <Box mt={4}>
+
+
+                {/* <Box mt={4}>
                   <LoadingBar progress={progress} />
+                </Box> */}
+
+                {/* <WorkflowStatusList /> */}
+                {/* <WorkflowStatusList
+                  stepStatus={analysisResults.step_status}
+                  stepsCompleted={analysisResults.processing_steps_completed}
+                /> */}
+                <Box mt={4}>
+                  <LoadingBar
+                    progress={
+                      (Object.values(stepStatus).filter((s) => s === 'completed').length / stepKeys.length) * 100
+                    }
+                  />
                 </Box>
 
-                <WorkflowStatusList />
+                <WorkflowStatusList stepStatus={stepStatus} />
+
+
               </>
             ) : null}
 
-            {submitted && (
+            {submitted && analysisResults && (
               <div className="mt-12">
                 <Box display="flex" alignItems="center" justifyContent="center" mb={2}>
                   <AssessmentIcon fontSize="large" sx={styles.resultsSectionIcon} />
@@ -229,7 +404,8 @@ export default function MainPage() {
                     Health Agent   Analysis Results
                   </Typography>
                 </Box>
-                <ResultsTab />
+                {/* <ResultsTab /> */}
+                <ResultsTab analysisResults={analysisResults} />
               </div>
             )}
           </Box>
