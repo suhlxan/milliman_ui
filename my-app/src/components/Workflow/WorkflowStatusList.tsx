@@ -94,18 +94,7 @@ const mapStatus = (backendStatus: string): TaskStatus => {
 };
 
 const WorkflowStatusList: React.FC<WorkflowStatusListProps> = ({ stepStatus, stepsCompleted }) => {
-  // const tasks: Task[] = Object.entries(stepStatus).map(([key, status]) => {
-  //   const { title, description } = stepDescriptions[key] || {
-  //     title: key,
-  //     description: 'No description available',
-  //   };
 
-  //   return {
-  //     title,
-  //     description,
-  //     status: mapStatus(status),
-  //   };
-  // });
   const allStepKeys = Object.keys(stepDescriptions);
 
   const tasks: Task[] = allStepKeys.map((key) => {
@@ -132,20 +121,10 @@ const WorkflowStatusList: React.FC<WorkflowStatusListProps> = ({ stepStatus, ste
         Workflow Execution Pipeline
       </Typography>
 
-      {/* <Typography variant="body2" color="textSecondary" mb={2}>
-        {tasks.filter(task => task.status === 'COMPLETE').length} of {totalSteps} steps completed
-      </Typography> */}
-      <Typography variant="body2" color="textSecondary" mb={1}>
-        {totalSteps} TOTAL STEPS
-      </Typography>
-      <Typography variant="body2" color="textSecondary" mb={1}>
-        {completedCount} COMPLETED
-      </Typography>
       <Typography variant="body2" color="textSecondary" mb={2}>
-        {processingCount} PROCESSING
+        {tasks.filter(task => task.status === 'COMPLETE').length} of {totalSteps} steps completed
       </Typography>
-
-
+     
       {tasks.map((task, index) => (
         <Box
           key={index}

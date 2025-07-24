@@ -45,6 +45,8 @@ export default function MainPage() {
   const [isExecuting, setIsExecuting] = useState(false);
   const [analysisResults, setAnalysisResults] = useState<any>(null);
   const [stepStatus, setStepStatus] = useState<Record<string, string>>({});
+  const [sessionId, setSessionId] = useState('');
+  const [isPolling, setIsPolling] = useState(false);
 
   // UI control state
   const [showStopButton, setShowStopButton] = useState(false);
@@ -58,6 +60,11 @@ export default function MainPage() {
     execute: handleExecute,
   } = useAnalysisRunner({
     formData: { firstName, lastName, gender, dob, zipCode, ssn },
+    onStatusUpdate: setStepStatus,
+    onComplete: () => {
+      setAnalysisResults({ step_status: stepStatus }); // or real results if available
+    },
+
   });
 
   useEffect(() => {
@@ -70,69 +77,15 @@ export default function MainPage() {
     }
   }, [isLoading, submitted]);
 
-
-  // const handleStart = async () => {
-  //   if (isExecuting) return;
-  //   setIsExecuting(true);
-  //   setShowStopButton(true);
-
-  //   try {
-  //     const health = await AgentService.checkHealthAgent();
-
-  //     if (health.status === 'healthy' && health.agent_available) {
-  //       const payload = {
-  //         first_name: firstName,
-  //         last_name: lastName,
-  //         ssn,
-  //         date_of_birth: dob?.toISOString().split('T')[0] ?? '',
-  //         gender: gender.charAt(0),
-  //         zip_code: zipCode
-  //       };
-
-  //       //  Step 1: Kick off Async Analysis FIRST
-  //       const asyncResult = await AgentService.startAnalysis(payload);
-
-  //       if (asyncResult.success) {
-  //         console.log('Async Session ID:', asyncResult.session_id);
-  //         console.log('Async Message:', asyncResult.message);
-
-  //         //  Step 2: Run Sync Analysis AFTER async kicks off
-  //         const syncResult = await AgentService.runAnalysisSync(payload);
-
-  //         if (syncResult.success) {
-  //           console.log('Sync Analysis Result:', syncResult);
-
-  //           setAnalysisResults(syncResult.analysis_results);
-  //           //  Step 3: Proceed with analysis simulation (UI flow)
-  //           handleExecute();
-  //           simulateStepProgress();
-  //         } else {
-  //           console.warn('Validation Errors (sync):', syncResult.errors);
-  //           alert('Synchronous analysis failed. Please check form input.');
-  //           setShowStopButton(false);
-  //         }
-  //       } else {
-  //         alert('Async analysis failed to start.');
-  //         setShowStopButton(false);
-  //       }
-
-  //     } else {
-  //       alert('Health Agent is currently unavailable.');
-  //       setShowStopButton(false);
-  //     }
-  //   } catch (error) {
-  //     console.error('Execute Health Agent failed:', error);
-  //     alert('Unexpected error during execution.');
-  //     setShowStopButton(false);
-  //   } finally {
-  //     setIsExecuting(false);
-  //   }
-  // };
   const handleStart = async () => {
     if (isExecuting) return;
     setIsExecuting(true);
     setShowStopButton(true);
-  
+
+    // Start loading UI immediately
+    handleExecute();
+    simulateStepProgress();
+
     try {
       const payload = {
         first_name: firstName,
@@ -140,18 +93,14 @@ export default function MainPage() {
         ssn,
         date_of_birth: dob?.toISOString().split('T')[0] ?? '',
         gender: gender.charAt(0),
-        zip_code: zipCode
+        zip_code: zipCode,
       };
-  
-      // Only run Sync Analysis
+
       const syncResult = await AgentService.runAnalysisSync(payload);
-  
+
       if (syncResult.success) {
         console.log('Sync Analysis Result:', syncResult);
-  
         setAnalysisResults(syncResult.analysis_results);
-        handleExecute();
-        simulateStepProgress();
       } else {
         console.warn('Validation Errors (sync):', syncResult.errors);
         alert('Synchronous analysis failed. Please check form input.');
@@ -165,7 +114,6 @@ export default function MainPage() {
       setIsExecuting(false);
     }
   };
-  
 
   const stepKeys = Object.keys(stepDescriptions);
 
@@ -193,6 +141,11 @@ export default function MainPage() {
     setShowStopButton(false);
     window.location.reload(); // Hard reset, replace with cancellation logic if needed
   };
+
+  const totalSteps = stepKeys.length;
+  const completedSteps = Object.values(stepStatus).filter(
+    (status) => status.toLowerCase() === 'completed'
+  ).length;
 
   return (
     // <div
@@ -237,7 +190,6 @@ export default function MainPage() {
           )}
 
           {/* Patient Details and Analysis */}
-          {/* <Box flex={2}> */}
           <Box flex={submitted && isChatVisible ? 2 : 1}>
             <Box display="flex" alignItems="center" justifyContent="center" mb={2}>
               <PersonIcon sx={styles.sectionTitleIcon} />
@@ -305,33 +257,6 @@ export default function MainPage() {
               <>
                 <AdvancedWorkflowContainer />
 
-                {/* <Box
-                  mt={6}
-                  display="grid"
-                  gridTemplateColumns="repeat(auto-fit, minmax(220px, 1fr))"
-                  gap={3}
-                >
-                  {[
-                    { label: 'TOTAL STEPS', value: 8 },
-                    { label: 'COMPLETED', value: 3 },
-                    { label: 'PROCESSING', value: 1 },
-                    { label: 'PROGRESS', value: `${progress}%` },
-                  ].map((item, index) => (
-                    <Paper
-                      key={index}
-                      elevation={3}
-                      className="shine-hover"
-                      sx={styles.statPaper}
-                    >
-                      <Typography variant="h4" sx={styles.statValue}>
-                        {item.value}
-                      </Typography>
-                      <Typography variant="body2" sx={styles.statLabel}>
-                        {item.label}
-                      </Typography>
-                    </Paper>
-                  ))}
-                </Box> */}
                 <Box
                   mt={6}
                   display="grid"
@@ -339,13 +264,12 @@ export default function MainPage() {
                   gap={3}
                 >
                   {(() => {
-                    const stepStatus = analysisResults?.step_status || {};
                     const totalSteps = Object.keys(stepStatus).length;
                     const completedSteps = Object.values(stepStatus).filter(
-                      (status) => (status as string).toLowerCase() === 'completed'
+                      (status) => status.toLowerCase() === 'completed'
                     ).length;
                     const processingSteps = Object.values(stepStatus).filter(
-                      (status) => (status as string).toLowerCase() === 'processing'
+                      (status) => status.toLowerCase() === 'processing'
                     ).length;
 
                     return [
@@ -371,27 +295,14 @@ export default function MainPage() {
                   })()}
                 </Box>
 
-
-
-                {/* <Box mt={4}>
-                  <LoadingBar progress={progress} />
-                </Box> */}
-
-                {/* <WorkflowStatusList /> */}
-                {/* <WorkflowStatusList
-                  stepStatus={analysisResults.step_status}
-                  stepsCompleted={analysisResults.processing_steps_completed}
-                /> */}
                 <Box mt={4}>
                   <LoadingBar
-                    progress={
-                      (Object.values(stepStatus).filter((s) => s === 'completed').length / stepKeys.length) * 100
-                    }
+                    progress={(completedSteps / stepKeys.length) * 100}
                   />
                 </Box>
 
+                {/* <WorkflowStatusList /> */}
                 <WorkflowStatusList stepStatus={stepStatus} />
-
 
               </>
             ) : null}
