@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { calculateAge, MAX_AGE } from "../utils/ageUtils";
 import { stepDescriptions } from "../components/Workflow/WorkflowStatusList";
+import AgentService from "../api/AgentService";
 
 interface UseAnalysisRunnerParams {
   formData: {
@@ -13,7 +14,7 @@ interface UseAnalysisRunnerParams {
     ssn: string;
   };
   onStart?: () => void;
-  onComplete?: () => void;
+  onComplete?: (result: any) => void;
   onStatusUpdate?: (status: Record<string, string>) => void;
 }
 
@@ -28,7 +29,7 @@ export function useAnalysisRunner({
   const [submitted, setSubmitted] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const execute = () => {
+  const execute = async () => {
     const { firstName, lastName, gender, dob, zipCode, ssn } = formData;
     const newErrors: Record<string, string> = {};
 
@@ -49,17 +50,10 @@ export function useAnalysisRunner({
     if (!/^\d{5}$/.test(zipCode)) {
       newErrors.zipCode = "Enter a valid 5-digit ZIP code.";
     }
-    // if (!zipCode || zipCode.length < 5 || zipCode.length > 10) {
-    //   newErrors.zipCode = "ZIP code must be between 5 and 10 characters.";
-    // }
 
     if (!/^\d{9}$/.test(ssn.replace(/\D/g, ''))) {
       newErrors.ssn = "Enter a 9-digit SSN.";
     }
-    // const cleanSSN = ssn.replace(/\D/g, '');
-    // if (!cleanSSN || cleanSSN.length < 9 || cleanSSN.length > 11) {
-    //   newErrors.ssn = "SSN must be between 9 and 11 digits.";
-    // }
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
@@ -69,16 +63,13 @@ export function useAnalysisRunner({
     // Scroll to top
     window.scrollTo({ top: 0, behavior: "smooth" });
 
-    // Trigger external start logic
     onStart?.();
-
-    // Reset and run
     setErrors({});
     setProgress(0);
     setSubmitted(false);
     setIsLoading(true);
 
-    // Polling simulation
+    // Simulate step progress
     const stepKeys = Object.keys(stepDescriptions);
     const totalSteps = stepKeys.length;
     let currentStep = 0;
@@ -97,11 +88,36 @@ export function useAnalysisRunner({
 
       if (currentStep >= totalSteps) {
         clearInterval(interval);
-        setIsLoading(false);
-        setSubmitted(true);
-        onComplete?.();
       }
-    }, 3000); // 3 second per step
+    }, 3000); // 3 seconds per step
+
+    // Call the API
+    // try {
+    //   const payload = {
+    //     first_name: firstName,
+    //     last_name: lastName,
+    //     ssn,
+    //     date_of_birth: dob?.toISOString().split("T")[0] ?? '',
+    //     gender: gender.charAt(0),
+    //     zip_code: zipCode,
+    //   };
+
+    //   const syncResult = await AgentService.runAnalysisSync(payload);
+
+    //   if (syncResult.success) {
+    //     setSubmitted(true);
+    //     onComplete?.(syncResult);
+    //   } else {
+    //     setErrors({ general: "Synchronous analysis failed. Please check form input." });
+    //     setIsLoading(false);
+    //   }
+    // } catch (error) {
+    //   console.error("Sync analysis failed:", error);
+    //   setErrors({ general: "Unexpected error during execution." });
+    //   setIsLoading(false);
+    // } finally {
+    //   setIsLoading(false);
+    // }
   };
 
   return {

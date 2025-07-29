@@ -41,31 +41,35 @@ export default function MainPage() {
   const [zipCode, setZipCode] = useState('');
   const [chatOpen, setChatOpen] = useState(false);
   const [isChatVisible, setIsChatVisible] = useState(true);
-  const [sidebarWidth, setSidebarWidth] = useState(300);
+  const [sidebarWidth, setSidebarWidth] = useState(350);
   const [isExecuting, setIsExecuting] = useState(false);
   const [analysisResults, setAnalysisResults] = useState<any>(null);
   const [stepStatus, setStepStatus] = useState<Record<string, string>>({});
   const [sessionId, setSessionId] = useState('');
   const [isPolling, setIsPolling] = useState(false);
+  
 
   // UI control state
   const [showStopButton, setShowStopButton] = useState(false);
 
-  // useAnalysisRunner hook handles full analysis lifecycle
+
   const {
     isLoading,
     progress,
     submitted,
     errors,
+    setSubmitted, 
     execute: handleExecute,
   } = useAnalysisRunner({
     formData: { firstName, lastName, gender, dob, zipCode, ssn },
     onStatusUpdate: setStepStatus,
-    onComplete: () => {
-      setAnalysisResults({ step_status: stepStatus }); // or real results if available
+    onComplete: (syncResult) => {
+      setAnalysisResults(syncResult.analysis_results);
+      setSessionId(syncResult.session_id);
+      setIsExecuting(false); //  Reset execution state
     },
-
   });
+  
 
   useEffect(() => {
     document.title = 'Elevance Health | Milliman Dashboard';
@@ -81,11 +85,10 @@ export default function MainPage() {
     if (isExecuting) return;
     setIsExecuting(true);
     setShowStopButton(true);
-
-    // Start loading UI immediately
+  
     handleExecute();
     simulateStepProgress();
-
+  
     try {
       const payload = {
         first_name: firstName,
@@ -95,12 +98,18 @@ export default function MainPage() {
         gender: gender.charAt(0),
         zip_code: zipCode,
       };
-
+  
       const syncResult = await AgentService.runAnalysisSync(payload);
-
+  
       if (syncResult.success) {
         console.log('Sync Analysis Result:', syncResult);
+  
+        if (syncResult.session_id) {
+          setSessionId(syncResult.session_id);
+        }
+  
         setAnalysisResults(syncResult.analysis_results);
+        setSubmitted(true); //  This is crucial
       } else {
         console.warn('Validation Errors (sync):', syncResult.errors);
         alert('Synchronous analysis failed. Please check form input.');
@@ -114,6 +123,8 @@ export default function MainPage() {
       setIsExecuting(false);
     }
   };
+  
+  
 
   const stepKeys = Object.keys(stepDescriptions);
 
@@ -177,6 +188,7 @@ export default function MainPage() {
               visible={submitted && isChatVisible}
               onClose={() => setIsChatVisible(false)}
               onWidthChange={(w) => setSidebarWidth(w)}
+              sessionId={sessionId} //  Pass this to chatbot
             />
           )}
 

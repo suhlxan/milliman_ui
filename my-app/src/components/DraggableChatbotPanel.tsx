@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Box } from '@mui/material';
-import ChatbotPanel from './chatbot/ChatbotPanel';
+import ChatbotPanel from './Chatbot/ChatbotPanel';
 
 const MIN_WIDTH = 350;
 const MAX_WIDTH = 600;
@@ -8,11 +8,13 @@ const MAX_WIDTH = 600;
 const DraggableChatbotPanel = ({
     visible,
     onClose,
-    onWidthChange
+    onWidthChange,
+    sessionId
 }: {
     visible: boolean;
     onClose: () => void;
     onWidthChange?: (width: number) => void;
+    sessionId: string; //  Add sessionId here
 }) => {
     const [width, setWidth] = useState(350);
     const [resizing, setResizing] = useState(false);
@@ -84,7 +86,7 @@ const DraggableChatbotPanel = ({
                 }}
             />
 
-            <ChatbotPanel visible={visible} onClose={onClose} width={width} />
+            <ChatbotPanel visible={visible} onClose={onClose} width={width} sessionId={sessionId} />
         </Box>
     );
 };

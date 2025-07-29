@@ -10,6 +10,7 @@ import ChatSuggestions from './ChatSuggestions';
 import ChatClearButton from './ChatClearButton';
 import QuickAccordionSection from './QuickAccordionSection';
 import { chatbotToggleButton } from '../../pages/styles';
+import AgentService from '../../api/AgentService';
 
 import * as chatStyles from './styles';
 
@@ -17,18 +18,19 @@ interface ChatbotPanelProps {
   visible: boolean;
   onClose?: () => void;
   width?: number;
+  sessionId: string;
 }
 
-const ChatbotPanel: React.FC<ChatbotPanelProps> = ({ visible, onClose, width }) => {
-  const [shouldRender, setShouldRender] = useState(false); // controls mount
-  const [open, setOpen] = useState(false); // controls open state
+const ChatbotPanel: React.FC<ChatbotPanelProps> = ({ visible, onClose, width, sessionId }) => {
+  const [shouldRender, setShouldRender] = useState(false);
+  const [open, setOpen] = useState(false);
 
-  // Chat state
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState<{ text: string; fromUser: boolean; type?: string }[]>([]);
+  const [chatHistory, setChatHistory] = useState<any[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(true);
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
-
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (visible) {
@@ -39,41 +41,68 @@ const ChatbotPanel: React.FC<ChatbotPanelProps> = ({ visible, onClose, width }) 
 
   if (!shouldRender) return null;
 
-  const handleSend = () => {
-    if (!input.trim()) return;
+  const sendMessage = async (text: string) => {
+    const userMessage = { text, fromUser: true };
+    const newChatEntry = { role: 'user', content: text };
 
-    const userMessage = { text: input, fromUser: true };
     setMessages((prev) => [...prev, userMessage]);
+    setChatHistory((prev) => [...prev, newChatEntry]);
     setInput('');
     setShowSuggestions(false);
+    setLoading(true);
 
-    // Hardcoded response for blood sample question
-    if (input.toLowerCase().includes('blood sample')) {
-      const assistantResponse = {
-        text: 'Based on the complete deidentified claims data, there are 0 medical service records and 0 pharmacy records available for this patient. There is no information in the data indicating that the patient has had any blood samples taken. No dates, codes, or procedures related to blood sampling are present in the claims data.',
+    try {
+      const response = await AgentService.sendChatMessage(sessionId, text, [...chatHistory, newChatEntry]);
+
+      // const assistantMessage = {
+      //   text: response,
+      //   fromUser: false,
+      //   type: 'assistant-info',
+      // };
+      const assistantText = response?.response || 'No response received.';
+
+      const assistantMessage = {
+        text: assistantText,
         fromUser: false,
         type: 'assistant-info',
       };
 
-      setMessages((prev) => [...prev, assistantResponse]);
+      const assistantChatEntry = { role: 'agent', content: assistantText };
+
+
+      //const assistantChatEntry = { role: 'agent', content: response };
+
+      setMessages((prev) => [...prev, assistantMessage]);
+      setChatHistory((prev) => [...prev, assistantChatEntry]);
+    } catch (error) {
+      setMessages((prev) => [
+        ...prev,
+        { text: 'Something went wrong. Please try again.', fromUser: false, type: 'error' },
+      ]);
+    } finally {
+      setLoading(false);
     }
+  };
+
+  const handleSend = () => {
+    if (!input.trim()) return;
+    sendMessage(input);
   };
 
   const clearChat = () => {
     setMessages([]);
+    setChatHistory([]);
     setShowSuggestions(true);
   };
 
   return (
     <>
-      {/* Floating open icon when chat is closed */}
       {!open && (
         <IconButton onClick={() => setOpen(true)} sx={chatbotToggleButton}>
           <SmartToyIcon />
         </IconButton>
       )}
 
-      {/* Main Chat Panel */}
       <Box sx={chatStyles.chatPanelContainer(width)}>
         <ChatHeader onClose={onClose} />
         <ChatIntro />
@@ -86,33 +115,28 @@ const ChatbotPanel: React.FC<ChatbotPanelProps> = ({ visible, onClose, width }) 
               <ChatBubble key={i} text={msg.text} fromUser={msg.fromUser} type={msg.type} />
             ))
           )}
+          {loading && (
+            <ChatBubble text="Typing..." fromUser={false} type="loading" />
+          )}
         </Box>
 
-        {/* Show suggestions only when no messages exist */}
         {messages.length === 0 ? (
           <>
-            <ChatSuggestions onSelect={setInput} />
+            <ChatSuggestions onSelect={sendMessage} />
             <Box sx={{ px: 2, py: 1 }}>
               <Box sx={chatStyles.separatorLine} />
             </Box>
           </>
         ) : (
-          // Show separator after chat when messages exist
           <Box sx={{ px: 2, py: 1 }}>
             <Box sx={chatStyles.separatorLine} />
           </Box>
         )}
 
-        {/* <QuickAccordionSection onSelect={setInput} /> */}
         <QuickAccordionSection
           onSelect={(value) => {
-            const userMessage = { text: value, fromUser: true };
-            setMessages((prev) => [...prev, userMessage]);
-            setInput('');
-            setShowSuggestions(false);
-            setExpandedIndex(null); // Collapse the accordion
-
-            // TODO: Call your backend API here to get the assistant's response
+            sendMessage(value);
+            setExpandedIndex(null);
           }}
           expandedIndex={expandedIndex}
           setExpandedIndex={setExpandedIndex}
