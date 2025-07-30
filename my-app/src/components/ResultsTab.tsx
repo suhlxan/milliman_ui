@@ -1,6 +1,5 @@
-//components/Results.tsx
 import React, { useState } from 'react';
-import { Box, Tabs, Tab, Collapse, IconButton, Typography, Paper, } from '@mui/material';
+import { Box, Tabs, Tab, Collapse, IconButton, Typography, Paper, Tooltip } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import DescriptionIcon from '@mui/icons-material/Description';
@@ -8,11 +7,12 @@ import PrecisionManufacturingIcon from '@mui/icons-material/PrecisionManufacturi
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import SummarizeIcon from '@mui/icons-material/Summarize';
 import DatasetIcon from '@mui/icons-material/Dataset';
-import HealingIcon from '@mui/icons-material/Healing'; // For Diabetes
-import ElderlyIcon from '@mui/icons-material/Elderly'; // For Age Group
-import SmokingRoomsIcon from '@mui/icons-material/SmokingRooms'; // For Smoking
-import LiquorIcon from '@mui/icons-material/Liquor'; // For Alcohol
-import MonitorHeartIcon from '@mui/icons-material/MonitorHeart'; // For Blood Pressure
+import HealingIcon from '@mui/icons-material/Healing'; 
+import ElderlyIcon from '@mui/icons-material/Elderly'; 
+import SmokingRoomsIcon from '@mui/icons-material/SmokingRooms'; 
+import LiquorIcon from '@mui/icons-material/Liquor'; 
+import MonitorHeartIcon from '@mui/icons-material/MonitorHeart'; 
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 
 interface Props {
   analysisResults: {
@@ -48,29 +48,26 @@ interface Props {
   };
 }
 
-
-// const TABS = ['MCID Claims', 'Medical Claims', 'Pharmacy Claims'];
-
 export default function ResultsTab({ analysisResults }: Props) {
   const [claimsOpen, setClaimsOpen] = useState(false);
   const [selectedTab, setSelectedTab] = useState(0);
   const [panelOpen, setPanelOpen] = useState(false);
-  const [claimsExtractionOpen, setClaimsExtractionOpen] = useState(false); // State for Claims Data Extraction
-  const [extractionTab, setExtractionTab] = useState(0); // 0 = Medical, 1 = Pharmacy
+  const [claimsExtractionOpen, setClaimsExtractionOpen] = useState(false);
+  const [extractionTab, setExtractionTab] = useState(0);
   const [entityExtractionOpen, setEntityExtractionOpen] = useState(false);
   const [healthTrajectoryOpen, setHealthTrajectoryOpen] = useState(false);
   const [finalSummaryOpen, setFinalSummaryOpen] = useState(false);
   const [heartRiskOpen, setHeartRiskOpen] = useState(false);
+  const [isClaimsHovered, setIsClaimsHovered] = useState(false);
 
   const TABS = ['MCID Claims', 'Medical Claims', 'Pharmacy Claims'];
   const tabKeys = ['mcid', 'medical', 'pharmacy'];
 
   const apiData: { [key: string]: any } = {
-    mcid: analysisResults.deidentified_data?.mcid?.mcid_claims_data || {},
-    medical: analysisResults.deidentified_data?.medical?.medical_claims_data || {},
-    pharmacy: analysisResults.deidentified_data?.pharmacy?.pharmacy_claims_data || {}
+    mcid: analysisResults.deidentified_data?.mcid || {},
+    medical: analysisResults.deidentified_data?.medical || {},
+    pharmacy: analysisResults.deidentified_data?.pharmacy || {}
   };
-
 
   const extractionSummary = {
     medical: analysisResults.structured_extractions?.medical?.extraction_summary || {},
@@ -87,7 +84,7 @@ export default function ResultsTab({ analysisResults }: Props) {
 
   const handleTabChange = (_: React.SyntheticEvent, newIndex: number) => {
     setSelectedTab(newIndex);
-    setPanelOpen(true); // auto-open panel when switching tabs
+    setPanelOpen(true);
   };
 
   //const snippet = apiData[selectedTab].split('\n')[0];
@@ -95,15 +92,29 @@ export default function ResultsTab({ analysisResults }: Props) {
   return (
     <Box className="max-w-6xl mx-auto mt-4">
       {/* Claims Data Header */}
-      <Box className="bg-white p-2 rounded-2xl shadow-lg " display="flex" alignItems="center" onClick={toggleClaimsOpen} sx={{ cursor: 'pointer' }}>
+      <Box
+        className="bg-white p-2 rounded-2xl shadow-lg"
+        display="flex"
+        alignItems="center"
+        onClick={() => {
+          setClaimsOpen((prev) => {
+            const newState = !prev;
+            if (newState) setPanelOpen(true); // expand JSON by default when claims open
+            return newState;
+          });
+        }}
+        sx={{ cursor: 'pointer' }}
+      >
         <IconButton size="small" className="text-brand-cyan mr-2">
           {claimsOpen ? <ExpandMoreIcon /> : <ChevronRightIcon />}
         </IconButton>
         <DescriptionIcon sx={{ fontSize: 24, color: 'f7c59f', marginRight: 1 }} />
-        <Typography variant="h6" className="font-semibold text-brand-mediumBlue hover:text-brand-primary-blue transition-colors duration-200">
+        <Typography
+          variant="h6"
+          className="font-semibold text-brand-mediumBlue hover:text-brand-primary-blue transition-colors duration-200"
+        >
           Claims Data
         </Typography>
-
       </Box>
 
       {/* Collapsible Claims Section */}
@@ -134,37 +145,73 @@ export default function ResultsTab({ analysisResults }: Props) {
             </Tabs>
 
             {/* Panel for Tab Content */}
-            <Box className="mt-4 bg-white rounded-2xl shadow-lg overflow-hidden">
-              <Box className="p-4 flex items-center">
-                <IconButton
-                  size="small"
-                  onClick={togglePanelOpen}
-                  className="text-brand-cyan mr-2"
-                >
-                  {panelOpen ? (
-                    <ExpandMoreIcon fontSize="small" className="text-brand-cyan" />
-                  ) : (
-                    <ChevronRightIcon fontSize="small" className="text-brand-cyan" />
-                  )}
-                </IconButton>
-                <Typography variant="body1" className="text-gray-700">
-                  {
-                    apiData[tabKeys[selectedTab]]?.MESSAGE ||
-                    'No message available for this claim type.'
-                  }
-                </Typography>
+            <Box
+              className="mt-4 bg-white rounded-2xl shadow-lg overflow-hidden"
+              onMouseEnter={() => setIsClaimsHovered(true)}
+              onMouseLeave={() => setIsClaimsHovered(false)}
+            >
+              <Box className="p-4 flex items-center justify-between">
+                <Box display="flex" alignItems="center">
+                  <IconButton
+                    size="small"
+                    onClick={togglePanelOpen}
+                    className="text-brand-cyan mr-2"
+                  >
+                    {panelOpen ? (
+                      <ExpandMoreIcon fontSize="small" className="text-brand-cyan" />
+                    ) : (
+                      <ChevronRightIcon fontSize="small" className="text-brand-cyan" />
+                    )}
+                  </IconButton>
+
+                  {/*  Show message only if it exists and is not "User not found" */}
+                  {(() => {
+                    const currentTabKey = tabKeys[selectedTab];
+                    const currentData = apiData[currentTabKey];
+                    let message = '';
+
+                    if (currentTabKey === 'mcid') {
+                      message = currentData?.mcid_claims_data?.processStatus?.errorText || '';
+                    }
+
+                    return message ? (
+                      <Typography variant="body1" className="text-gray-700">
+                        {message}
+                      </Typography>
+                    ) : null;
+                  })()}
+                </Box>
+
+                {/*  Copy JSON Icon on Hover */}
+                {isClaimsHovered && (
+                  <Tooltip title="Copy JSON">
+                    <IconButton
+                      size="small"
+                      onClick={() => {
+                        const currentTabKey = tabKeys[selectedTab];
+                        const currentData = apiData[currentTabKey];
+                        navigator.clipboard.writeText(JSON.stringify(currentData, null, 2));
+                      }}
+                    >
+                      <ContentCopyIcon fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
+                )}
               </Box>
 
               <Collapse in={panelOpen} unmountOnExit>
-                <Box className="p-8 pt-0">
-                  {Object.entries(apiData[tabKeys[selectedTab]]).map(([key, value]) => (
-                    <Typography key={key} variant="body2" className="mb-2">
-                      <strong>{key}:</strong>{' '}
-                      {typeof value === 'object'
-                        ? JSON.stringify(value, null, 2)
-                        : String(value)}
-                    </Typography>
-                  ))}
+                <Box className="p-4 bg-gray-50 rounded-lg">
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      whiteSpace: 'pre-wrap',
+                      fontFamily: 'monospace',
+                      fontSize: '14px',
+                      color: '#374151',
+                    }}
+                  >
+                    {JSON.stringify(apiData[tabKeys[selectedTab]], null, 2)}
+                  </Typography>
                 </Box>
               </Collapse>
             </Box>
@@ -252,7 +299,8 @@ export default function ResultsTab({ analysisResults }: Props) {
       </Box>
       {/* Enhanced Entity Extraction Section */}
       <Box mt={6}>
-        <Box className="bg-white p-2 rounded-2xl shadow-lg "
+        <Box
+          className="bg-white p-2 rounded-2xl shadow-lg"
           display="flex"
           alignItems="center"
           onClick={() => setEntityExtractionOpen(prev => !prev)}
@@ -261,16 +309,20 @@ export default function ResultsTab({ analysisResults }: Props) {
           <IconButton size="small" className="text-brand-cyan mr-2">
             {entityExtractionOpen ? <ExpandMoreIcon /> : <ChevronRightIcon />}
           </IconButton>
-
           <PrecisionManufacturingIcon sx={{ fontSize: 24, color: '#1E58AA', marginRight: 1 }} />
-          <Typography variant="h6" className="font-semibold text-brand-mediumBlue  hover:text-brand-primary-blue transition-colors duration-200">
+          <Typography variant="h6" className="font-semibold text-brand-mediumBlue hover:text-brand-primary-blue transition-colors duration-200">
             Enhanced Entity Extraction
           </Typography>
-
         </Box>
 
         <Collapse in={entityExtractionOpen} unmountOnExit>
-          <Box mt={3} display="flex" gap={4} flexWrap="wrap">
+          <Box
+            mt={3}
+            display="flex"
+            justifyContent="space-between"
+            flexWrap="wrap" 
+            gap={2}
+          >
             {[
               { label: 'Diabetes', value: entities.diabetics || 'unknown', icon: <HealingIcon sx={{ color: '#d81b60', mr: 1 }} /> },
               { label: 'Age Group', value: entities.age_group || 'unknown', icon: <ElderlyIcon sx={{ color: '#6d4c41', mr: 1 }} /> },
@@ -281,32 +333,39 @@ export default function ResultsTab({ analysisResults }: Props) {
               <Paper
                 key={index}
                 elevation={2}
-                className="p-4 rounded-lg min-w-[300px] text-center"
+                className="p-4 rounded-lg text-center"
                 sx={{
-                  p: 4, // padding
-                  borderRadius: 2,
-                  minWidth: 350, // increased from 300
-                  minHeight: 160, // optional: gives more vertical space
+                  width: 210,
+                  minHeight: 150,
                   display: 'flex',
                   flexDirection: 'column',
                   justifyContent: 'center',
+                  alignItems: 'center',
+                  gap: 1,
                 }}
               >
-                <Box display="flex" alignItems="center" justifyContent="center" mb={1}>
+                <Box display="flex" alignItems="center" justifyContent="center">
                   {item.icon}
                   <Typography variant="h6" className="font-bold text-brand-navy">
                     {item.label}
                   </Typography>
                 </Box>
-                <Typography variant="body2" className="text-gray-600">
-                  {item.value}
+                <Typography
+                  variant="body1"
+                  sx={{
+                    textTransform: 'uppercase',
+                    fontWeight: 'bold',
+                    color: '#374151',
+                  }}
+                >
+                  {item.value.toUpperCase()}
                 </Typography>
               </Paper>
             ))}
           </Box>
         </Collapse>
-
       </Box>
+
       {/* Health Trajectory Section */}
       <Box mt={6}>
         <Box
@@ -412,7 +471,7 @@ export default function ResultsTab({ analysisResults }: Props) {
               }}
             >
               <Typography variant="body1" className="font-semibold text-brand-navy">
-               {heartRisk || 'Risk data not available'}
+                {heartRisk || 'Risk data not available'}
               </Typography>
             </Box>
           </Box>
