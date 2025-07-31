@@ -1,4 +1,4 @@
-// src/components/Workflow/WorkflowStatusList.tsx
+// // src/components/Workflow/WorkflowStatusList.tsx
 import React from 'react';
 import { Box, Typography, CircularProgress, Chip } from '@mui/material';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
@@ -14,8 +14,7 @@ interface Task {
 }
 
 interface WorkflowStatusListProps {
-  stepStatus: Record<string, string>; // e.g. { fetch_api_data: "completed" }
-  stepsCompleted?: number;
+  currentStepIndex: number;
 }
 
 const statusColors: Record<TaskStatus, string> = {
@@ -29,7 +28,6 @@ const statusBackgrounds: Record<TaskStatus, string> = {
   PROCESSING: '#fffde7',
   WAITING: '#f5f5f5',
 };
-
 
 const getStatusIcon = (status: TaskStatus) => {
   const color = statusColors[status];
@@ -45,8 +43,6 @@ const getStatusIcon = (status: TaskStatus) => {
   }
 };
 
-// const stepDescriptions: Record<string, { title: string; description: string }> = {
-  
 export const stepDescriptions: Record<string, { title: string; description: string }> = {
   fetch_api_data: {
     title: 'Fetching Claims Data',
@@ -82,38 +78,18 @@ export const stepDescriptions: Record<string, { title: string; description: stri
   },
 };
 
-const mapStatus = (backendStatus: string): TaskStatus => {
-  switch (backendStatus?.toLowerCase()) {
-    case 'completed':
-      return 'COMPLETE';
-    case 'processing':
-      return 'PROCESSING';
-    default:
-      return 'WAITING';
-  }
-};
-
-const WorkflowStatusList: React.FC<WorkflowStatusListProps> = ({ stepStatus, stepsCompleted }) => {
-
+const WorkflowStatusList: React.FC<WorkflowStatusListProps> = ({ currentStepIndex }) => {
   const allStepKeys = Object.keys(stepDescriptions);
 
-  const tasks: Task[] = allStepKeys.map((key) => {
-    const backendStatus = stepStatus[key] as string | undefined || 'waiting'; // default to 'waiting'
+  const tasks: Task[] = allStepKeys.map((key, index) => {
     const { title, description } = stepDescriptions[key];
+    let status: TaskStatus = 'WAITING';
 
-    return {
-      title,
-      description,
-      status: mapStatus(backendStatus),
-    };
+    if (index < currentStepIndex) status = 'COMPLETE';
+    else if (index === currentStepIndex) status = 'PROCESSING';
+
+    return { title, description, status };
   });
-
-
-  const totalSteps = tasks.length;
-
-  const completedCount = tasks.filter(task => task.status === 'COMPLETE').length;
-  const processingCount = tasks.filter(task => task.status === 'PROCESSING').length;
-
 
   return (
     <Box mt={6} p={3} bgcolor="white" borderRadius={3} boxShadow={3}>
@@ -121,10 +97,6 @@ const WorkflowStatusList: React.FC<WorkflowStatusListProps> = ({ stepStatus, ste
         Workflow Execution Pipeline
       </Typography>
 
-      <Typography variant="body2" color="textSecondary" mb={2}>
-        {tasks.filter(task => task.status === 'COMPLETE').length} of {totalSteps} steps completed
-      </Typography>
-     
       {tasks.map((task, index) => (
         <Box
           key={index}

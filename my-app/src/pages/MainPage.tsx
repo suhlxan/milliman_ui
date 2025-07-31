@@ -17,7 +17,6 @@ import { capitalizeFirstLetter } from '../utils/format';
 import { calculateAge } from '../utils/ageUtils';
 import { useAnalysisRunner } from '../hooks/useAnalysisRunner';
 
-
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import PersonIcon from '@mui/icons-material/Person';
 import AssessmentIcon from '@mui/icons-material/Assessment';
@@ -47,18 +46,15 @@ export default function MainPage() {
   const [stepStatus, setStepStatus] = useState<Record<string, string>>({});
   const [sessionId, setSessionId] = useState('');
   const [isPolling, setIsPolling] = useState(false);
-  
-
-  // UI control state
-  const [showStopButton, setShowStopButton] = useState(false);
-
+  const [currentStepIndex, setCurrentStepIndex] = useState(0);
+  const [showStopButton, setShowStopButton] = useState(false);// UI control state
 
   const {
     isLoading,
     progress,
     submitted,
     errors,
-    setSubmitted, 
+    setSubmitted,
     execute: handleExecute,
   } = useAnalysisRunner({
     formData: { firstName, lastName, gender, dob, zipCode, ssn },
@@ -69,7 +65,6 @@ export default function MainPage() {
       setIsExecuting(false); //  Reset execution state
     },
   });
-  
 
   useEffect(() => {
     document.title = 'Elevance Health | Milliman Dashboard';
@@ -85,10 +80,10 @@ export default function MainPage() {
     if (isExecuting) return;
     setIsExecuting(true);
     setShowStopButton(true);
-  
+
     handleExecute();
     simulateStepProgress();
-  
+
     try {
       const payload = {
         first_name: firstName,
@@ -98,18 +93,17 @@ export default function MainPage() {
         gender: gender.charAt(0),
         zip_code: zipCode,
       };
-  
+
       const syncResult = await AgentService.runAnalysisSync(payload);
-  
+
       if (syncResult.success) {
         console.log('Sync Analysis Result:', syncResult);
-  
+
         if (syncResult.session_id) {
           setSessionId(syncResult.session_id);
         }
-  
         setAnalysisResults(syncResult.analysis_results);
-        setSubmitted(true); //  This is crucial
+        setSubmitted(true);
       } else {
         console.warn('Validation Errors (sync):', syncResult.errors);
         alert('Synchronous analysis failed. Please check form input.');
@@ -123,28 +117,13 @@ export default function MainPage() {
       setIsExecuting(false);
     }
   };
-  
-  
 
   const stepKeys = Object.keys(stepDescriptions);
 
   const simulateStepProgress = async () => {
     for (let i = 0; i < stepKeys.length; i++) {
-      const currentStep = stepKeys[i];
-
-      // Set current step to processing
-      setStepStatus((prev) => ({
-        ...prev,
-        [currentStep]: 'processing',
-      }));
-
-      await new Promise((resolve) => setTimeout(resolve, 1500)); // Simulate delay
-
-      // Mark current step as completed
-      setStepStatus((prev) => ({
-        ...prev,
-        [currentStep]: 'completed',
-      }));
+      setCurrentStepIndex(i); // Update current step index
+      await new Promise((resolve) => setTimeout(resolve, 1500));
     }
   };
 
@@ -159,8 +138,6 @@ export default function MainPage() {
   ).length;
 
   return (
-    // <div
-    //   className="min-h-screen bg-gray-100">
     <div
       className="min-h-screen bg-gray-100"
       style={styles.getContainerMargin(submitted, isChatVisible, sidebarWidth)}
@@ -258,7 +235,6 @@ export default function MainPage() {
                   variant="contained"
                   size="large"
                   onClick={handleStart}
-                  // className="bg-brand-primary-blue hover:bg-brand-mediumBlue active:bg-black rounded-full px-12 py-3"
                   startIcon={<PlayArrowIcon />}
                   className={styles.executeButtonClass}
                 >
@@ -276,13 +252,10 @@ export default function MainPage() {
                   gap={3}
                 >
                   {(() => {
-                    const totalSteps = Object.keys(stepStatus).length;
-                    const completedSteps = Object.values(stepStatus).filter(
-                      (status) => status.toLowerCase() === 'completed'
-                    ).length;
-                    const processingSteps = Object.values(stepStatus).filter(
-                      (status) => status.toLowerCase() === 'processing'
-                    ).length;
+                    const totalSteps = stepKeys.length;
+                    const completedSteps = currentStepIndex;
+                    const processingSteps = currentStepIndex < totalSteps ? 1 : 0;
+                    const progress = Math.floor((completedSteps / totalSteps) * 100);
 
                     return [
                       { label: 'TOTAL STEPS', value: totalSteps },
@@ -290,12 +263,7 @@ export default function MainPage() {
                       { label: 'PROCESSING', value: processingSteps },
                       { label: 'PROGRESS', value: `${progress}%` },
                     ].map((item, index) => (
-                      <Paper
-                        key={index}
-                        elevation={3}
-                        className="shine-hover"
-                        sx={styles.statPaper}
-                      >
+                      <Paper key={index} elevation={3} className="shine-hover" sx={styles.statPaper}>
                         <Typography variant="h4" sx={styles.statValue}>
                           {item.value}
                         </Typography>
@@ -305,17 +273,15 @@ export default function MainPage() {
                       </Paper>
                     ));
                   })()}
+
                 </Box>
 
                 <Box mt={4}>
-                  <LoadingBar
-                    progress={(completedSteps / stepKeys.length) * 100}
-                  />
+                  <LoadingBar progress={(currentStepIndex / stepKeys.length) * 100} />
                 </Box>
 
                 {/* <WorkflowStatusList /> */}
-                <WorkflowStatusList stepStatus={stepStatus} />
-
+                <WorkflowStatusList currentStepIndex={currentStepIndex} />
               </>
             ) : null}
 
