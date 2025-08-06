@@ -1,4 +1,4 @@
-// components/navbar/NavMenu.tsx
+// // components/navbar/NavMenu.tsx
 import React from 'react';
 import { Menu, MenuItem, Divider } from '@mui/material';
 
@@ -7,17 +7,44 @@ interface NavMenuProps {
   open: boolean;
   onClose: () => void;
   onRerun?: () => void;
+  onPrint?: () => void;
+  onAbout?: () => void;
+  onSettings?: () => void;
 }
 
-/**
- * NavMenu Component
- * ----------------------------------------------------------------------------
- * Dropdown menu for navigation bar actions like rerunning logic, printing,
- * or accessing settings/about. Connected to a vertical "More" icon.
- */
-const NavMenu: React.FC<NavMenuProps> = ({ anchorEl, open, onClose, onRerun }) => {
+// /**
+//  * NavMenu Component
+//  * ----------------------------------------------------------------------------
+//  * Dropdown menu for navigation bar actions like rerunning logic, printing,
+//  * or accessing settings/about. Connected to a vertical "More" icon.
+//  */
+
+const NavMenu: React.FC<NavMenuProps> = ({
+  anchorEl,
+  open,
+  onClose,
+  onRerun,
+  onPrint,
+  onAbout,
+  onSettings,
+}) => {
   const handleRerun = () => {
     onRerun?.();
+    onClose();
+  };
+
+  const handlePrint = () => {
+    onPrint?.();
+    onClose();
+  };
+
+  const handleAbout = () => {
+    onAbout?.();
+    onClose();
+  };
+
+  const handleSettings = () => {
+    onSettings?.();
     onClose();
   };
 
@@ -41,13 +68,22 @@ const NavMenu: React.FC<NavMenuProps> = ({ anchorEl, open, onClose, onRerun }) =
       <MenuItem sx={{ color: '#131331' }} onClick={handleRerun}>
         Rerun <span style={{ marginLeft: "auto", fontSize: "0.8rem", opacity: 0.6 }}>Ctrl+R</span>
       </MenuItem>
-      <MenuItem sx={{ color: '#131331' }} onClick={onClose}>Settings</MenuItem>
+
+      <MenuItem sx={{ color: '#131331' }} onClick={handleSettings}>
+        Settings
+      </MenuItem>
+
       <Divider />
-      <MenuItem sx={{ color: '#131331' }} onClick={() => { window.print(); onClose(); }}>
+
+      <MenuItem sx={{ color: '#131331' }} onClick={handlePrint}>
         Print
       </MenuItem>
+
       <Divider />
-      <MenuItem sx={{ color: '#131331' }} onClick={onClose}>About</MenuItem>
+
+      <MenuItem sx={{ color: '#131331' }} onClick={handleAbout}>
+        About
+      </MenuItem>
     </Menu>
   );
 };

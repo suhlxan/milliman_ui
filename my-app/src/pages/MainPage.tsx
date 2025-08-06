@@ -30,7 +30,6 @@ import AgentService from '../api/AgentService';
 import { stepDescriptions } from '../components/Workflow/WorkflowStatusList';
 
 export default function MainPage() {
-  // Form state
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [gender, setGender] = useState('');
@@ -62,7 +61,7 @@ export default function MainPage() {
     onComplete: (syncResult) => {
       setAnalysisResults(syncResult.analysis_results);
       setSessionId(syncResult.session_id);
-      setIsExecuting(false); //  Reset execution state
+      setIsExecuting(false); 
     },
   });
 
@@ -122,14 +121,14 @@ export default function MainPage() {
 
   const simulateStepProgress = async () => {
     for (let i = 0; i < stepKeys.length; i++) {
-      setCurrentStepIndex(i); // Update current step index
+      setCurrentStepIndex(i); 
       await new Promise((resolve) => setTimeout(resolve, 1500));
     }
   };
 
   const handleStop = () => {
     setShowStopButton(false);
-    window.location.reload(); // Hard reset, replace with cancellation logic if needed
+    window.location.reload(); 
   };
 
   const totalSteps = stepKeys.length;
@@ -149,158 +148,157 @@ export default function MainPage() {
         showStopButton={showStopButton}
         onStop={handleStop}
       />
-
-      {/* PAGE CONTENT */}
-      <div className={styles.contentContainerClass}>
-        <Box
-          display="flex"
-          flexDirection={submitted ? { xs: 'column', md: 'row' } : 'column'}
-          gap={2}
-          alignItems="stretch"
-          width="100%"
-        >
-          {/* Chatbot Panel (only when submitted) */}
-          {submitted && isChatVisible && (
-            <DraggableChatbotPanel
-              visible={submitted && isChatVisible}
-              onClose={() => setIsChatVisible(false)}
-              onWidthChange={(w) => setSidebarWidth(w)}
-              sessionId={sessionId} //  Pass this to chatbot
-            />
-          )}
-
-          {submitted && !isChatVisible && (
-            <IconButton
-              onClick={() => setIsChatVisible(true)}
-              sx={styles.chatbotToggleButton}
-            >
-              <SmartToyIcon />
-            </IconButton>
-          )}
-
-          {/* Patient Details and Analysis */}
-          <Box flex={submitted && isChatVisible ? 2 : 1}>
-            <Box display="flex" alignItems="center" justifyContent="center" mb={2}>
-              <PersonIcon sx={styles.sectionTitleIcon} />
-              <Typography component="h2" variant="h4" className={styles.sectionTitleTextClass}>
-                Patient Information
-              </Typography>
-            </Box>
-
-            <Typography variant="body1" className={styles.descriptionTextClass}>
-              Enter patient information below. This data will be processed through
-              the Health Agent workflow with AI analysis and will be available for
-              interactive chat queries.
-            </Typography>
-
-            <PersonalDetailsForm
-              firstName={firstName}
-              setFirstName={(val) => setFirstName(capitalizeFirstLetter(sanitizeName(val)))}
-              lastName={lastName}
-              setLastName={(val) => setLastName(capitalizeFirstLetter(sanitizeName(val)))}
-              gender={gender}
-              setGender={setGender}
-              ssn={ssn}
-              setSSN={setSSN}
-              showSSN={showSSN}
-              setShowSSN={setShowSSN}
-              dob={dob}
-              setDob={setDob}
-              zipCode={zipCode}
-              setZipCode={setZipCode}
-              errors={errors}
-            />
-
-            {dob && !isNaN(dob.getTime()) && calculateAge(dob.toISOString().split("T")[0]) && (
-              <Box
-                display="flex"
-                alignItems="center"
-                className="bg-brand-pale-cyan"
-                borderRadius={2}
-                paddingY={2}
-                paddingX={3}
-                marginTop={4}
-                sx={styles.cardAgeBox}
+  
+      {/*  Printable Content Wrapper */}
+      <div id="printable-content">
+        {/* PAGE CONTENT */}
+        <div className={styles.contentContainerClass}>
+          <Box
+            display="flex"
+            flexDirection={submitted ? { xs: 'column', md: 'row' } : 'column'}
+            gap={2}
+            alignItems="stretch"
+            width="100%"
+          >
+            {/* Chatbot Panel (only when submitted) */}
+            {submitted && isChatVisible && (
+              <DraggableChatbotPanel
+                visible={submitted && isChatVisible}
+                onClose={() => setIsChatVisible(false)}
+                onWidthChange={(w) => setSidebarWidth(w)}
+                sessionId={sessionId}
+              />
+            )}
+  
+            {submitted && !isChatVisible && (
+              <IconButton
+                onClick={() => setIsChatVisible(true)}
+                sx={styles.chatbotToggleButton}
               >
-                <CalendarMonthIcon color="primary" sx={styles.calendarIcon} />
-                <Typography variant="body1">
-                  <strong>Calculated Age:</strong> {calculateAge(dob.toISOString().split("T")[0])} old
+                <SmartToyIcon />
+              </IconButton>
+            )}
+  
+            {/* Patient Details and Analysis */}
+            <Box flex={submitted && isChatVisible ? 2 : 1}>
+              <Box display="flex" alignItems="center" justifyContent="center" mb={2}>
+                <PersonIcon sx={styles.sectionTitleIcon} />
+                <Typography component="h2" variant="h4" className={styles.sectionTitleTextClass}>
+                  Patient Information
                 </Typography>
               </Box>
-            )}
-
-            {!isLoading && !submitted ? (
-              <Box className="flex justify-center mt-12">
-                <Button
-                  variant="contained"
-                  size="large"
-                  onClick={handleStart}
-                  startIcon={<PlayArrowIcon />}
-                  className={styles.executeButtonClass}
-                >
-                  Execute Health Agent
-                </Button>
-              </Box>
-            ) : isLoading && !submitted ? (
-              <>
-                <AdvancedWorkflowContainer />
-
+  
+              <Typography variant="body1" className={styles.descriptionTextClass}>
+                Enter patient information below. This data will be processed through
+                the Health Agent workflow with AI analysis and will be available for
+                interactive chat queries.
+              </Typography>
+  
+              <PersonalDetailsForm
+                firstName={firstName}
+                setFirstName={(val) => setFirstName(capitalizeFirstLetter(sanitizeName(val)))}
+                lastName={lastName}
+                setLastName={(val) => setLastName(capitalizeFirstLetter(sanitizeName(val)))}
+                gender={gender}
+                setGender={setGender}
+                ssn={ssn}
+                setSSN={setSSN}
+                showSSN={showSSN}
+                setShowSSN={setShowSSN}
+                dob={dob}
+                setDob={setDob}
+                zipCode={zipCode}
+                setZipCode={setZipCode}
+                errors={errors}
+              />
+  
+              {dob && !isNaN(dob.getTime()) && calculateAge(dob.toISOString().split("T")[0]) && (
                 <Box
-                  mt={6}
-                  display="grid"
-                  gridTemplateColumns="repeat(auto-fit, minmax(220px, 1fr))"
-                  gap={3}
+                  display="flex"
+                  alignItems="center"
+                  className="bg-brand-pale-cyan"
+                  borderRadius={2}
+                  paddingY={2}
+                  paddingX={3}
+                  marginTop={4}
+                  sx={styles.cardAgeBox}
                 >
-                  {(() => {
-                    const totalSteps = stepKeys.length;
-                    const completedSteps = currentStepIndex;
-                    const processingSteps = currentStepIndex < totalSteps ? 1 : 0;
-                    const progress = Math.floor((completedSteps / totalSteps) * 100);
-
-                    return [
-                      { label: 'TOTAL STEPS', value: totalSteps },
-                      { label: 'COMPLETED', value: completedSteps },
-                      { label: 'PROCESSING', value: processingSteps },
-                      { label: 'PROGRESS', value: `${progress}%` },
-                    ].map((item, index) => (
-                      <Paper key={index} elevation={3} className="shine-hover" sx={styles.statPaper}>
-                        <Typography variant="h4" sx={styles.statValue}>
-                          {item.value}
-                        </Typography>
-                        <Typography variant="body2" sx={styles.statLabel}>
-                          {item.label}
-                        </Typography>
-                      </Paper>
-                    ));
-                  })()}
-
-                </Box>
-
-                <Box mt={4}>
-                  <LoadingBar progress={(currentStepIndex / stepKeys.length) * 100} />
-                </Box>
-
-                {/* <WorkflowStatusList /> */}
-                <WorkflowStatusList currentStepIndex={currentStepIndex} />
-              </>
-            ) : null}
-
-            {submitted && analysisResults && (
-              <div className="mt-12">
-                <Box display="flex" alignItems="center" justifyContent="center" mb={2}>
-                  <AssessmentIcon fontSize="large" sx={styles.resultsSectionIcon} />
-                  <Typography variant="h4" className={styles.resultsTitleClass}>
-                    Health Agent   Analysis Results
+                  <CalendarMonthIcon color="primary" sx={styles.calendarIcon} />
+                  <Typography variant="body1">
+                    <strong>Calculated Age:</strong> {calculateAge(dob.toISOString().split("T")[0])} old
                   </Typography>
                 </Box>
-                {/* <ResultsTab /> */}
-                <ResultsTab analysisResults={analysisResults} />
-              </div>
-            )}
+              )}
+  
+              {!isLoading && !submitted ? (
+                <Box className="flex justify-center mt-12">
+                  <Button
+                    variant="contained"
+                    size="large"
+                    onClick={handleStart}
+                    startIcon={<PlayArrowIcon />}
+                    className={styles.executeButtonClass}
+                  >
+                    Execute Health Agent
+                  </Button>
+                </Box>
+              ) : isLoading && !submitted ? (
+                <>
+                  <AdvancedWorkflowContainer />
+  
+                  <Box
+                    mt={6}
+                    display="grid"
+                    gridTemplateColumns="repeat(auto-fit, minmax(220px, 1fr))"
+                    gap={3}
+                  >
+                    {(() => {
+                      const totalSteps = stepKeys.length;
+                      const completedSteps = currentStepIndex;
+                      const processingSteps = currentStepIndex < totalSteps ? 1 : 0;
+                      const progress = Math.floor((completedSteps / totalSteps) * 100);
+  
+                      return [
+                        { label: 'TOTAL STEPS', value: totalSteps },
+                        { label: 'COMPLETED', value: completedSteps },
+                        { label: 'PROCESSING', value: processingSteps },
+                        { label: 'PROGRESS', value: `${progress}%` },
+                      ].map((item, index) => (
+                        <Paper key={index} elevation={3} className="shine-hover" sx={styles.statPaper}>
+                          <Typography variant="h4" sx={styles.statValue}>
+                            {item.value}
+                          </Typography>
+                          <Typography variant="body2" sx={styles.statLabel}>
+                            {item.label}
+                          </Typography>
+                        </Paper>
+                      ));
+                    })()}
+                  </Box>
+  
+                  <Box mt={4}>
+                    <LoadingBar progress={(currentStepIndex / stepKeys.length) * 100} />
+                  </Box>
+  
+                  <WorkflowStatusList currentStepIndex={currentStepIndex} />
+                </>
+              ) : null}
+  
+              {submitted && analysisResults && (
+                <div className="mt-12">
+                  <Box display="flex" alignItems="center" justifyContent="center" mb={2}>
+                    <AssessmentIcon fontSize="large" sx={styles.resultsSectionIcon} />
+                    <Typography variant="h4" className={styles.resultsTitleClass}>
+                      Health Agent Analysis Results
+                    </Typography>
+                  </Box>
+                  <ResultsTab analysisResults={analysisResults} />
+                </div>
+              )}
+            </Box>
           </Box>
-        </Box>
+        </div>
       </div>
-
     </div>
   );
 }

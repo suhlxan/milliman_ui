@@ -7,11 +7,11 @@ import PrecisionManufacturingIcon from '@mui/icons-material/PrecisionManufacturi
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import SummarizeIcon from '@mui/icons-material/Summarize';
 import DatasetIcon from '@mui/icons-material/Dataset';
-import HealingIcon from '@mui/icons-material/Healing'; 
-import ElderlyIcon from '@mui/icons-material/Elderly'; 
-import SmokingRoomsIcon from '@mui/icons-material/SmokingRooms'; 
-import LiquorIcon from '@mui/icons-material/Liquor'; 
-import MonitorHeartIcon from '@mui/icons-material/MonitorHeart'; 
+import HealingIcon from '@mui/icons-material/Healing';
+import ElderlyIcon from '@mui/icons-material/Elderly';
+import SmokingRoomsIcon from '@mui/icons-material/SmokingRooms';
+import LiquorIcon from '@mui/icons-material/Liquor';
+import MonitorHeartIcon from '@mui/icons-material/MonitorHeart';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 
 interface Props {
@@ -319,8 +319,8 @@ export default function ResultsTab({ analysisResults }: Props) {
           <Box
             mt={3}
             display="flex"
-            justifyContent="space-between"
-            flexWrap="wrap" 
+            flexWrap="wrap"
+            justifyContent="flex-start"
             gap={2}
           >
             {[
@@ -335,7 +335,10 @@ export default function ResultsTab({ analysisResults }: Props) {
                 elevation={2}
                 className="p-4 rounded-lg text-center"
                 sx={{
-                  width: 210,
+                  p: 2,
+                  borderRadius: 2,
+                  width: 'calc(20% - 16px)',
+                  minWidth: 180,
                   minHeight: 150,
                   display: 'flex',
                   flexDirection: 'column',

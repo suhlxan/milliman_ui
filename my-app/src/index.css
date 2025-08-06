@@ -87,3 +87,13 @@
     opacity: 0;
   }
 }
+
+@media print {
+  .non-printable {
+    display: none !important;
+  }
+
+  #printable-content {
+    display: block;
+  }
+}
