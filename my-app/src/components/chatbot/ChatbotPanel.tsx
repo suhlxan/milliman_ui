@@ -68,8 +68,6 @@ const ChatbotPanel: React.FC<ChatbotPanelProps> = ({ visible, onClose, width, se
       };
 
       const assistantChatEntry = { role: 'agent', content: assistantText };
-
-
       //const assistantChatEntry = { role: 'agent', content: response };
 
       setMessages((prev) => [...prev, assistantMessage]);

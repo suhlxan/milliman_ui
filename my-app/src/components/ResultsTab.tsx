@@ -48,6 +48,73 @@ interface Props {
   };
 }
 
+const parseSummaryText = (text: string) => {
+  const lines = text.split('\n');
+  const parsed = [];
+
+  for (let line of lines) {
+    line = line.trim();
+    if (!line) continue;
+    if (line.startsWith('## ')) {
+      parsed.push({ type: 'main_heading', text: line.replace(/^##\s*/, '') });
+    } else if (line.startsWith('**') && line.endsWith('**')) {
+      parsed.push({ type: 'main_heading', text: line.replace(/\*\*/g, '') });
+    } else if (line.startsWith('### ')) {
+      parsed.push({ type: 'section_heading', text: line.replace(/^###\s*/, '') });
+    } else if (line.startsWith('- ')) {
+      parsed.push({ type: 'key_point', text: line.replace(/^- /, '') });
+    } else if (/^\d+\.\s/.test(line)) {
+      parsed.push({ type: 'key_point', text: line });
+    } else {
+      parsed.push({ type: 'paragraph', text: line });
+    }
+  }
+  return parsed;
+};
+
+const renderSummary = (summaryData: { type: string; text: string }[]) => {
+  return summaryData.map((item, index) => {
+    switch (item.type) {
+      case 'main_heading':
+        return (
+          <Typography
+            key={index}
+            variant="h6"
+            sx={{ fontWeight: 600, fontSize: '1.0rem', mb: 2, color: '#000000' }}
+          >
+            {item.text}
+          </Typography>
+        );
+
+      case 'section_heading':
+        return (
+          <Typography
+            key={index}
+            variant="body2"
+            sx={{ fontWeight: 200, mb: 1, color: '#000000' }} 
+          >
+            {item.text}
+          </Typography>
+        );
+
+      case 'key_point':
+        return (
+          <Typography key={index} variant="body2" sx={{ mb: 0.5 }}>
+            {item.text} 
+          </Typography>
+        );
+
+      case 'paragraph':
+      default:
+        return (
+          <Typography key={index} variant="body2" sx={{ mb: 1 }}>
+            {item.text} 
+          </Typography>
+        );
+    }
+  });
+};
+
 export default function ResultsTab({ analysisResults }: Props) {
   const [claimsOpen, setClaimsOpen] = useState(false);
   const [selectedTab, setSelectedTab] = useState(0);
@@ -87,8 +154,6 @@ export default function ResultsTab({ analysisResults }: Props) {
     setPanelOpen(true);
   };
 
-  //const snippet = apiData[selectedTab].split('\n')[0];
-
   return (
     <Box className="max-w-6xl mx-auto mt-4">
       {/* Claims Data Header */}
@@ -99,7 +164,7 @@ export default function ResultsTab({ analysisResults }: Props) {
         onClick={() => {
           setClaimsOpen((prev) => {
             const newState = !prev;
-            if (newState) setPanelOpen(true); // expand JSON by default when claims open
+            if (newState) setPanelOpen(true);
             return newState;
           });
         }}
@@ -120,7 +185,7 @@ export default function ResultsTab({ analysisResults }: Props) {
       {/* Collapsible Claims Section */}
       <Collapse in={claimsOpen} unmountOnExit>
         <Box mt={3}>
-          <Paper elevation={2} className="p-4 rounded-xl">
+          <Paper elevation={2} className="p-4 rounded-xl" sx={{ backgroundColor: '#f5faff'}}>
             <Tabs
               value={selectedTab}
               onChange={handleTabChange}
@@ -134,6 +199,7 @@ export default function ResultsTab({ analysisResults }: Props) {
                   label={label}
                   value={index}
                   sx={{
+                    fontWeight: 600, 
                     '&:hover': {
                       backgroundColor: 'white',
                       color: '#1355E9',
@@ -242,10 +308,10 @@ export default function ResultsTab({ analysisResults }: Props) {
               variant="fullWidth"
             >
               <Tab label="Medical Claims Extraction"
-                sx={{ '&:hover': { backgroundColor: '#white', color: '#1355E9', transition: 'all 0.3s ease', }, }}
+                sx={{ fontWeight: 600, '&:hover': { backgroundColor: '#white', color: '#1355E9', transition: 'all 0.3s ease', }, }}
               />
               <Tab label="Pharmacy Claims Extraction"
-                sx={{ '&:hover': { backgroundColor: '#white', color: '#1355E9', transition: 'all 0.3s ease', }, }}
+                sx={{ fontWeight: 600, '&:hover': { backgroundColor: '#white', color: '#1355E9', transition: 'all 0.3s ease', }, }}
               />
             </Tabs>
 
@@ -256,7 +322,6 @@ export default function ResultsTab({ analysisResults }: Props) {
                   Medical Claims Extraction Summary
                 </Typography>
                 <Box display="flex" gap={4} flexWrap="wrap" mt={2}>
-                  {/* <Paper elevation={2} className="p-4 rounded-lg min-w-[300px] text-center"> */}
                   <Paper elevation={2} className="text-center" sx={{ p: 4, borderRadius: 2, minWidth: 350, minHeight: 160, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
                     <Typography variant="h4" className="font-bold text-brand-navy">{extractionSummary.medical.total_hlth_srvc_records ?? 0}</Typography>
                     <Typography variant="body2" className="text-gray-600">Health Service Records</Typography>
@@ -390,14 +455,14 @@ export default function ResultsTab({ analysisResults }: Props) {
 
         <Collapse in={healthTrajectoryOpen} unmountOnExit>
           <Box mt={3} className="bg-white p-6 rounded-xl shadow-md">
-            <Typography
+            {/* <Typography
               variant="body2"
               className="text-gray-800"
               sx={{ whiteSpace: 'pre-line' }}
             >
               {trajectory}
-            </Typography>
-
+            </Typography> */}
+            {renderSummary(parseSummaryText(trajectory))}
           </Box>
         </Collapse>
       </Box>
@@ -417,18 +482,18 @@ export default function ResultsTab({ analysisResults }: Props) {
           <Typography variant="h6" className="font-semibold text-brand-mediumBlue  hover:text-brand-primary-blue transition-colors duration-200">
             Patient Health Summary
           </Typography>
-
         </Box>
 
         <Collapse in={finalSummaryOpen} unmountOnExit>
           <Box mt={3} className="bg-white p-6 rounded-xl shadow-md">
-            <Typography
+            {/* <Typography
               variant="body2"
               className="text-gray-800"
               sx={{ whiteSpace: 'pre-line' }}
             >
               {finalSummary}
-            </Typography>
+            </Typography> */}
+            {renderSummary(parseSummaryText(finalSummary))}
           </Box>
         </Collapse>
 
@@ -456,7 +521,6 @@ export default function ResultsTab({ analysisResults }: Props) {
               variant="h6"
               sx={{
                 color: '#1e40af',
-                // borderBottom: '2px solid #3b82f6',
                 display: 'inline-block',
                 paddingBottom: '6px',
                 marginBottom: '16px',

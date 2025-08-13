@@ -64,7 +64,6 @@ const QuickAccordionSection: React.FC<QuickAccordionSectionProps> = ({ onSelect,
             {groups.map((group, index) => (
                 <Accordion
                     key={index}
-                    //new
                     expanded={expandedIndex === index}
                     onChange={() => setExpandedIndex(expandedIndex === index ? null : index)}
 

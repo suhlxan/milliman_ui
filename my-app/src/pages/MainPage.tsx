@@ -46,7 +46,7 @@ export default function MainPage() {
   const [sessionId, setSessionId] = useState('');
   const [isPolling, setIsPolling] = useState(false);
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
-  const [showStopButton, setShowStopButton] = useState(false);// UI control state
+  const [showStopButton, setShowStopButton] = useState(false);
 
   const {
     isLoading,

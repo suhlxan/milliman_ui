@@ -1,13 +1,12 @@
 // components/chatbot/ChatBubble.tsx
-
 import React from 'react';
 import { Paper, Typography, Box } from '@mui/material';
 import SmartToyIcon from '@mui/icons-material/SmartToy';
 
 // Props for each chat message bubble
 interface ChatBubbleProps {
-  text: string;   // The content of the message
-  fromUser?: boolean;// Whether the message was sent by the user
+  text: string;  
+  fromUser?: boolean;
   type?: string;
 }
 
@@ -79,8 +78,8 @@ const ChatBubble: React.FC<ChatBubbleProps> = ({ text, fromUser = false, type })
       <Paper
         sx={{
           p: 1.5,
-          borderRadius: 2,// Rounded corners 
-          maxWidth: '80%', // Prevent bubbles from stretching full width
+          borderRadius: 2,
+          maxWidth: '80%', 
           backgroundColor: fromUser ? '#E1EDFF' : '#f1f5fb',
         }}
         elevation={1}

@@ -19,10 +19,11 @@ const NavBar: React.FC<NavBarProps> = ({
   onRerun,
   showStopButton = false,
   onStop,
+
 }) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [showAbout, setShowAbout] = useState(false);
-  const [showSettings, setShowSettings] = useState(false); //  Add state for settings dialog
+  const [showSettings, setShowSettings] = useState(false); 
   const open = Boolean(anchorEl);
 
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
@@ -84,7 +85,7 @@ const NavBar: React.FC<NavBarProps> = ({
             onRerun={onRerun}
             onPrint={handlePrint}
             onAbout={() => setShowAbout(true)}
-            onSettings={() => setShowSettings(true)} //  Pass settings handler
+            onSettings={() => setShowSettings(true)} 
           />
         </div>
       </div>
@@ -96,7 +97,7 @@ const NavBar: React.FC<NavBarProps> = ({
         PaperProps={{
           sx: {
             width: '400px',
-            height: '300px', 
+            height: '300px',
             maxWidth: 'none',
             borderRadius: 2,
             boxShadow: 6,
@@ -105,30 +106,12 @@ const NavBar: React.FC<NavBarProps> = ({
             justifyContent: 'center',
             alignItems: 'center',
             textAlign: 'center',
-            overflow: 'hidden', // Prevent scrollbars
+            overflow: 'hidden', 
           },
         }}
       >
         <DialogTitle sx={{ fontWeight: 'bold', fontSize: '1.2rem' }}>Made with</DialogTitle>
 
-        {/* <DialogContent>
-          <Typography variant="body2" gutterBottom>
-            React v19.1.0 <br />
-            <a
-              href="https://react.dev/"
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{ color: '#1976d2', textDecoration: 'underline' }}
-            >
-              React.dev
-            </a>
-            <br />
-            Copyright 2025 Snowflake Inc. All rights reserved.
-          </Typography>
-          <Button onClick={() => setShowAbout(false)} sx={{ mt: 2 }} variant="outlined">
-            Close
-          </Button>
-        </DialogContent> */}
         <DialogContent>
           <Typography variant="body2" gutterBottom>
             React v19.1.0 <br />
@@ -161,6 +144,7 @@ const NavBar: React.FC<NavBarProps> = ({
 
       {/*  Settings Dialog */}
       {/* <SettingsDialog open={showSettings} onClose={() => setShowSettings(false)} /> */}
+      
     </div>
   );
 };

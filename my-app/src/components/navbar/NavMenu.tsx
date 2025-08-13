@@ -69,9 +69,9 @@ const NavMenu: React.FC<NavMenuProps> = ({
         Rerun <span style={{ marginLeft: "auto", fontSize: "0.8rem", opacity: 0.6 }}>Ctrl+R</span>
       </MenuItem>
 
-      <MenuItem sx={{ color: '#131331' }} onClick={handleSettings}>
+      {/* <MenuItem sx={{ color: '#131331' }} onClick={handleSettings}>
         Settings
-      </MenuItem>
+      </MenuItem> */}
 
       <Divider />
 

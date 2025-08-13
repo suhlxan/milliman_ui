@@ -35,7 +35,7 @@ const ChatSuggestions: React.FC<{ onSelect: (text: string) => void }> = ({ onSel
       {suggestions.map((suggestion) => (
         <Box
           key={suggestion}
-          onClick={() => onSelect(suggestion)}      // notify parent of selection
+          onClick={() => onSelect(suggestion)}      
           sx={{
             px: 2,
             py: 1,
