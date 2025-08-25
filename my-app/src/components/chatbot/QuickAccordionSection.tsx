@@ -61,18 +61,18 @@ const QuickAccordionSection: React.FC<QuickAccordionSectionProps> = ({ onSelect,
             <Typography variant="h6" sx={{ mb: 2, fontWeight: 'bold', color: '#333' }}>
                 💡Quick Questions
             </Typography>
+
             {groups.map((group, index) => (
                 <Accordion
                     key={index}
                     expanded={expandedIndex === index}
                     onChange={() => setExpandedIndex(expandedIndex === index ? null : index)}
-
                     disableGutters
                     sx={{
-                        backgroundColor: '#F4F6F8',
                         borderRadius: 2,
                         boxShadow: 'none',
                         mb: 1,
+                        border: '1px solid #E0E0E0',
                         '&:before': { display: 'none' },
                     }}
                 >
@@ -82,16 +82,17 @@ const QuickAccordionSection: React.FC<QuickAccordionSectionProps> = ({ onSelect,
                             px: 2,
                             py: 1,
                             color: '#1A1A1A',
-                            transition: 'background-color 0.2s ease',
+                            border: '1px solid #E0E0E0',
+                            borderRadius: 2,
+                            transition: 'border-color 0.2s ease',
                             '&:hover': {
-                                backgroundColor: '#E8F0FE',
-                                borderRadius: 2,
+                                borderColor: '#90CAF9',
                             },
                         }}
-
                     >
                         <Typography sx={{ fontSize: '0.95rem' }}>{group.category}</Typography>
                     </AccordionSummary>
+
                     <AccordionDetails sx={{ px: 2, pb: 2 }}>
                         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
                             {group.questions.map((q, i) => (
@@ -110,7 +111,7 @@ const QuickAccordionSection: React.FC<QuickAccordionSectionProps> = ({ onSelect,
                                         display: 'flex',
                                         alignItems: 'center',
                                         '&:hover': {
-                                            backgroundColor: '#E8F0FE',
+                                            background: 'linear-gradient(90deg, #E8F0FE 0%, #F0F4FF 100%)',
                                             borderColor: '#B0C4DE',
                                         },
                                     }}
@@ -132,43 +133,56 @@ const QuickAccordionSection: React.FC<QuickAccordionSectionProps> = ({ onSelect,
                     <Box
                         onClick={() => onSelect('Summary')}
                         sx={{
-                            px: 4,
-                            py: 1,
+                            px: 3,
+                            py: 0.6,
                             backgroundColor: '#fff',
-                            borderRadius: 2,
+                            borderRadius: 3,
                             cursor: 'pointer',
-                            border: '1px solid #E0E0E0',
-                            color: '#333',
+                            border: '2px solid #1976D2',
+                            boxShadow: '0 1px 3px rgba(25, 118, 210, 0.1)',
+                            color: '#000',
                             display: 'flex',
                             alignItems: 'center',
+                            gap: 1,
+                            fontSize: '0.85rem',
+                            transition: 'all 0.25s ease-in-out',
                             '&:hover': {
-                                backgroundColor: '#E8F0FE',
-                                borderColor: '#B0C4DE',
+                                background: 'linear-gradient(90deg, #E8F0FE 0%, #F0F4FF 100%)',
+                                borderColor: '#0D47A1',
+                                boxShadow: '0 4px 12px rgba(13, 71, 161, 0.2)',
+                                transform: 'scale(1.02)',
                             },
                         }}
                     >
-                        <DescriptionIcon sx={{ fontSize: 18, color: '#1976D2', mr: 1 }} />
+                        <DescriptionIcon sx={{ fontSize: 18, color: '#1976D2' }} />
                         Summary
                     </Box>
+
                     <Box
                         onClick={() => onSelect('Heart Risk')}
                         sx={{
-                            px: 4,
-                            py: 1,
+                            px: 3,
+                            py: 0.6,
                             backgroundColor: '#fff',
-                            borderRadius: 2,
+                            borderRadius: 3,
                             cursor: 'pointer',
-                            border: '1px solid #E0E0E0',
-                            color: '#333',
+                            border: '2px solid #D32F2F',
+                            boxShadow: '0 1px 3px rgba(211, 47, 47, 0.1)',
+                            color: '#000',
                             display: 'flex',
                             alignItems: 'center',
+                            gap: 1,
+                            fontSize: '0.85rem',
+                            transition: 'all 0.25s ease-in-out',
                             '&:hover': {
-                                backgroundColor: '#E8F0FE',
-                                borderColor: '#B0C4DE',
+                                background: 'linear-gradient(90deg, #FFEDEE 0%, #FFF5F5 100%)',
+                                borderColor: '#B71C1C',
+                                boxShadow: '0 4px 12px rgba(183, 28, 28, 0.2)',
+                                transform: 'scale(1.02)',
                             },
                         }}
                     >
-                        <FavoriteIcon sx={{ fontSize: 18, color: '#D32F2F', mr: 1 }} />
+                        <FavoriteIcon sx={{ fontSize: 18, color: '#D32F2F' }} />
                         Heart Risk
                     </Box>
                 </Box>
